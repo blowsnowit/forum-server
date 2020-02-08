@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.TopicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.Topic">
+        <id column="topic_id" property="topicId" />
+        <result column="topic_name" property="topicName" />
+        <result column="topic_desc" property="topicDesc" />
+        <result column="topic_add_time" property="topicAddTime" />
+    </resultMap>
+
+    <resultMap id="TopicDTOResultMap" type="cn.bload.forum.entity.dto.TopicDTO" extends="BaseResultMap">
+        <result column="article_num" property="articleNum" />
+    </resultMap>
+
+    <insert id="replaceInto" keyProperty="topicId">
+        INSERT INTO forum_topic
+        (topic_name, topic_add_time)
+        values
+        (#{articleTopic},now())
+        ON DUPLICATE KEY
+    </insert>
+
+    <select id="getHotTopics" resultType="cn.bload.forum.entity.dto.TopicDTO">
+        SELECT
+            ft.*,count(fat.topic_id) as articleNum
+        FROM
+            forum_topic ft
+            LEFT JOIN forum_article_topic fat ON fat.topic_id = ft.topic_id
+            GROUP BY ft.topic_id
+            order by articleNum desc
+    </select>
+
+</mapper>

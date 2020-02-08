@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.Article">
+        <id column="article_id" property="articleId" />
+        <result column="user_id" property="userId" />
+        <result column="article_title" property="articleTitle" />
+        <result column="article_content" property="articleContent" />
+        <result column="article_add_time" property="articleAddTime" />
+        <result column="article_update_time" property="articleUpdateTime" />
+        <result column="article_status" property="articleStatus" />
+        <result column="article_view" property="articleView" />
+    </resultMap>
+
+    <resultMap id="ArticleDTOResultMap" type="cn.bload.forum.entity.dto.ArticleDTO" >
+        <id column="article_id" property="articleId" />
+        <result column="article_title" property="articleTitle" />
+        <result column="article_content" property="articleContent" />
+        <result column="article_add_time" property="articleAddTime" />
+        <result column="article_update_time" property="articleUpdateTime" />
+        <result column="article_status" property="articleStatus" />
+        <result column="article_view" property="articleView" />
+        <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
+        </association>
+        <collection property="articleTopics" column="article_id" select="cn.bload.forum.dao.ArticleTopicMapper.selectTopicByArticleId">
+        </collection>
+        <collection property="articleTags" column="article_id" select="cn.bload.forum.dao.ArticleTagMapper.selectTagsByArticleId">
+        </collection>
+    </resultMap>
+
+    <update id="updateArticleView">
+        update forum_article
+        set article_view = article_view + 1
+        where article_id = #{articleId}
+    </update>
+
+
+    <select id="getArticles" resultMap="ArticleDTOResultMap">
+        select
+        a.*,
+        u.user_id user_user_id,
+        u.user_name user_user_name,
+        u.user_nick user_user_nick,
+        u.user_desc user_user_desc,
+        u.user_add_time user_user_add_time,
+        u.user_face user_user_face
+        from forum_article a
+        left join forum_user u on u.user_id = a.user_id
+        left join forum_article_tag atg on atg.article_id = a.article_id
+        left join forum_tag tg on tg.tag_id = atg.tag_id
+        left join forum_article_topic atp on atp.article_id = a.article_id
+        left join forum_topic tp on tp.topic_id = atp.topic_id
+        <where>
+            <if test="userId != null">
+                and a.user_id = #{userId}
+            </if>
+            <if test="tagName != null">
+                and tg.tag_name = #{tagName}
+            </if>
+            <if test="topicName != null">
+                and tp.topic_name = #{topicName}
+            </if>
+            <if test="nowUserId != null">
+                and IF(a.user_id = #{nowUserId}, 1 = 1,a.article_status = 1)
+            </if>
+            <if test="nowUserId == null">
+                and a.article_status = 1
+            </if>
+            -- 搜索需要优化
+            <if test="search != null">
+                and a.article_title like concat(#{search},'%')
+            </if>
+        </where>
+        GROUP BY a.article_id
+    </select>
+
+    <select id="getArticle" resultMap="ArticleDTOResultMap">
+        select
+        a.*,
+        u.user_id user_user_id,
+        u.user_name user_user_name,
+        u.user_nick user_user_nick,
+        u.user_desc user_user_desc,
+        u.user_add_time user_user_add_time,
+        u.user_face user_user_face,
+        GROUP_CONCAT(DISTINCT tg.tag_name order by atg.article_tag_id SEPARATOR ',') articleTags,
+        GROUP_CONCAT(DISTINCT tp.topic_name order by atp.article_topic_id  SEPARATOR ',') articleTopics
+        from forum_article a
+        left join forum_user u on u.user_id = a.user_id
+        left join forum_article_tag atg on atg.article_id = a.article_id
+        left join forum_tag tg on tg.tag_id = atg.tag_id
+        left join forum_article_topic atp on atp.article_id = a.article_id
+        left join forum_topic tp on tp.topic_id = atp.topic_id
+        where
+            a.article_id = #{articleId}
+        group by a.article_id
+    </select>
+
+
+</mapper>

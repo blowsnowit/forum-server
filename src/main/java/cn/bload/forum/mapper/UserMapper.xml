@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.User">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_password" property="userPassword" />
+        <result column="user_nick" property="userNick" />
+        <result column="user_desc" property="userDesc" />
+        <result column="user_status" property="userStatus" />
+        <result column="user_face" property="userFace" />
+    </resultMap>
+
+    <resultMap id="ArticleUserDTOMap" type="cn.bload.forum.entity.dto.ArticleUserDTO">
+        <id column="user_id" property="userId" />
+        <result column="user_name" property="userName" />
+        <result column="user_nick" property="userNick" />
+        <result column="user_desc" property="userDesc" />
+        <result column="user_face" property="userFace" />
+    </resultMap>
+
+</mapper>
