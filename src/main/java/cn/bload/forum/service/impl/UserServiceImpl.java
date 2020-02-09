@@ -17,6 +17,7 @@ import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
+import cn.bload.forum.entity.vo.UserUpdateEmailVO;
 import cn.bload.forum.entity.vo.UserUpdatePasswordVO;
 import cn.bload.forum.entity.vo.UserUpdateVO;
 import cn.bload.forum.exception.MyRuntimeException;
@@ -50,6 +51,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userMapper.selectOne(queryWrapper);
     }
 
+    public User findByUserEmail(String email) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUserEmail,email);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+
+
     @Override
     public UserDTO login(UserLoginVO userLoginVO) throws MyRuntimeException {
         User user =  findByUserName(userLoginVO.getUserName());
@@ -57,7 +66,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new MyRuntimeException("账号不存在");
         }
         String saltPassowrd = PasswordUtil.encodePassword(userLoginVO.getPassword());
-        log.info(saltPassowrd);
         if (!user.getUserPassword().equals(saltPassowrd)){
             throw new MyRuntimeException("密码错误");
         }
@@ -76,6 +84,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user != null){
             throw new MyRuntimeException("账号已存在");
         }
+        //验证邮箱是否存在
+        user = findByUserEmail(userRegisterVO.getEmail());
+        if (user != null){
+            throw new MyRuntimeException("邮箱已存在");
+        }
+
         //注册对象
         User registerUser = new User();
         String saltPassowrd = PasswordUtil.encodePassword(userRegisterVO.getPassword());
@@ -126,6 +140,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User newUser = new User();
         newUser.setUserId(userId);
         newUser.setUserPassword(saltPassowrd);
+        userMapper.updateById(newUser);
+    }
+
+    @Override
+    public void updateUserEmailCheck(Integer userId, UserUpdateEmailVO userUpdateEmailVO) {
+        //验证旧密码是否正确
+        String oldSaltPassowrd = PasswordUtil.encodePassword(userUpdateEmailVO.getOldUserPassword());
+        User user = userMapper.selectById(userId);
+        if (!user.getUserPassword().equals(oldSaltPassowrd)){
+            throw new MyRuntimeException("旧密码不正确");
+        }
+        if (user.getUserEmail().equals(userUpdateEmailVO.getEmail())){
+            throw new MyRuntimeException("旧邮箱和新邮箱是同一个");
+        }
+        //验证邮箱是否存在
+        user = findByUserEmail(userUpdateEmailVO.getEmail());
+        if (user != null){
+            throw new MyRuntimeException("邮箱已存在");
+        }
+        User newUser = new User();
+        newUser.setUserId(userId);
+        newUser.setUserEmail(userUpdateEmailVO.getEmail());
         userMapper.updateById(newUser);
     }
 }

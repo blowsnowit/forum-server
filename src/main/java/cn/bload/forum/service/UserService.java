@@ -6,6 +6,7 @@ import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
+import cn.bload.forum.entity.vo.UserUpdateEmailVO;
 import cn.bload.forum.entity.vo.UserUpdatePasswordVO;
 import cn.bload.forum.entity.vo.UserUpdateVO;
 import cn.bload.forum.model.User;
@@ -56,5 +57,12 @@ public interface UserService extends IService<User> {
      * @param userUpdatePasswordVO
      */
     void updateUserPasswordCheck(Integer userId, UserUpdatePasswordVO userUpdatePasswordVO);
+
+    /**
+     * 更新用户邮箱并且检查
+     * @param userId
+     * @param userUpdateEmailVO
+     */
+    void updateUserEmailCheck(Integer userId, UserUpdateEmailVO userUpdateEmailVO);
 
 }

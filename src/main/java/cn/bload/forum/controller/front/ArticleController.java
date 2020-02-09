@@ -48,7 +48,7 @@ public class ArticleController extends BaseController {
     }
 
     @GetMapping("/hot")
-    @ApiOperation(value = "",notes = "获取热门文章列表")
+    @ApiOperation(value = "/hot",notes = "获取热门文章列表")
     public ResultBean getHotArticles(ArticleQuery articleQuery){
         articleQuery.setNowUserId(getUserIdNoCheck());
         articleQuery.setPageOrders("a.article_view desc");
@@ -60,7 +60,7 @@ public class ArticleController extends BaseController {
 
 
     @GetMapping("/{articleId}")
-    @ApiOperation(value = "",notes = "/获取指定文章")
+    @ApiOperation(value = "/{articleId}",notes = "/获取指定文章")
     public ResultBean getArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId){
         ArticleDTO article = articleService.getArticle(articleId);
         //已被删除 且 不属于当前用户的文章
@@ -79,7 +79,7 @@ public class ArticleController extends BaseController {
 
 
     @PutMapping("/{articleId}")
-    @ApiOperation(value = "",notes = "编辑文章")
+    @ApiOperation(value = "/{articleId}",notes = "编辑文章")
     public ResultBean saveArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                   @RequestBody ArticleVO articleVO){
         articleService.saveArticle(articleId,getUserId(),articleVO);
@@ -87,7 +87,7 @@ public class ArticleController extends BaseController {
     }
 
     @PutMapping("/{articleId}/{articleStatus}")
-    @ApiOperation(value = "",notes = "修改文章状态")
+    @ApiOperation(value = "/{articleId}/{articleStatus}",notes = "修改文章状态")
     public ResultBean saveArticleStatus(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                         @ApiParam(value = "文章状态") @PathVariable Integer articleStatus){
         articleService.saveArticleStatus(articleId,getUserId(),articleStatus);
@@ -95,7 +95,7 @@ public class ArticleController extends BaseController {
     }
 
     @PostMapping("/view/{articleId}")
-    @ApiOperation(value = "",notes = "添加文章阅览记录")
+    @ApiOperation(value = "/view/{articleId}",notes = "添加文章阅览记录")
     public ResultBean addArticleView(@ApiParam(value = "文章id") @PathVariable Integer articleId){
         if (articleId == null){
             ResultGenerator.getErrorResult("文章不存在");

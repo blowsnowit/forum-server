@@ -24,6 +24,7 @@ import cn.bload.forum.entity.dto.UserDTO;
 import cn.bload.forum.entity.vo.UserEmailVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
+import cn.bload.forum.entity.vo.UserUpdateEmailVO;
 import cn.bload.forum.entity.vo.UserUpdatePasswordVO;
 import cn.bload.forum.entity.vo.UserUpdateVO;
 import cn.bload.forum.exception.MyRuntimeException;
@@ -88,6 +89,7 @@ public class UserController extends BaseController {
     /**
      * 验证邮箱验证码
      * TODO 限制检查次数和时间
+     * TODO 考虑是否只能使用一次验证码
      * @param email 邮箱
      * @param code 验证码
      */
@@ -164,6 +166,17 @@ public class UserController extends BaseController {
     @ApiOperation(value = "/password", notes = "更新用户密码")
     public ResultBean updateUserPassword(@Valid @RequestBody UserUpdatePasswordVO userUpdatePasswordVO){
         userService.updateUserPasswordCheck(getUserId(),userUpdatePasswordVO);
+        return ResultGenerator.getSuccessResult("更新成功");
+    }
+
+
+    @PutMapping(value = "/email")
+    @ApiOperation(value = "/email", notes = "更新用户邮箱")
+    public ResultBean updateUserEmail(@Valid @RequestBody UserUpdateEmailVO userUpdateEmailVO){
+        //验证邮箱验证码
+        checkEmailCode(userUpdateEmailVO.getEmail(),userUpdateEmailVO.getEmailCode());
+
+        userService.updateUserEmailCheck(getUserId(),userUpdateEmailVO);
         return ResultGenerator.getSuccessResult("更新成功");
     }
 }

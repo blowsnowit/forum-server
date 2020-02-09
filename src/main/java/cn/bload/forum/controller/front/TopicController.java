@@ -33,7 +33,7 @@ public class TopicController extends BaseController {
     TopicService topicService;
 
     @GetMapping("/{topicName}")
-    @ApiOperation(value = "",notes = "/获取指定话题信息")
+    @ApiOperation(value = "/{topicName}",notes = "/获取指定话题信息")
     public ResultBean getTopicInfo(@ApiParam(value = "话题名称") @PathVariable String topicName){
         TopicDTO topicDTO = topicService.getTopicInfo(topicName);
         if (topicDTO == null){
@@ -44,7 +44,7 @@ public class TopicController extends BaseController {
 
     //获取热门话题列表
     @GetMapping("/hot")
-    @ApiOperation(value = "",notes = "/获取热门话题列表")
+    @ApiOperation(value = "/hot",notes = "/获取热门话题列表")
     public ResultBean getHotTopics(TopicQuery topicQuery){
         Page page = topicQuery.createPage();
         List<TopicDTO> topicDTOList = topicService.getHotTopics(topicQuery);

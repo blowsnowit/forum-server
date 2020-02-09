@@ -24,6 +24,9 @@ public class UserDTO {
     @ApiModelProperty(value = "用户昵称")
     private String userNick;
 
+    @ApiModelProperty(value = "用户邮箱")
+    private String userEmail;
+
     @ApiModelProperty(value = "用户签名/描述")
     private String userDesc;
 
