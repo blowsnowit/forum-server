@@ -1,11 +1,17 @@
 package cn.bload.forum.service.impl;
 
-import cn.bload.forum.model.Config;
-import cn.bload.forum.dao.ConfigMapper;
-import cn.bload.forum.service.ConfigService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import javax.annotation.Resource;
+
+import cn.bload.forum.dao.ConfigMapper;
+import cn.bload.forum.model.Config;
+import cn.bload.forum.service.ConfigService;
 
 /**
  * <p>
@@ -20,4 +26,17 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     @Resource
     ConfigMapper configMapper;
 
+    @Override
+    public List<Config> getConfigsByType(String type) {
+        QueryWrapper<Config> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Config::getConfigType,type);
+        return configMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public Config getConfig(String key) {
+        QueryWrapper<Config> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Config::getConfigKey,key);
+        return configMapper.selectOne(queryWrapper);
+    }
 }

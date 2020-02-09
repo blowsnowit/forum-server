@@ -9,18 +9,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import cn.bload.forum.base.BaseController;
 import cn.bload.forum.base.ResultBean;
+import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
+import cn.bload.forum.entity.vo.UserEmailVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
 import cn.bload.forum.entity.vo.UserUpdatePasswordVO;
 import cn.bload.forum.entity.vo.UserUpdateVO;
+import cn.bload.forum.exception.MyRuntimeException;
+import cn.bload.forum.service.MailService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.ResultGenerator;
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.CircleCaptcha;
+import cn.hutool.captcha.ICaptcha;
+import cn.hutool.core.util.RandomUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -37,6 +50,76 @@ import io.swagger.annotations.ApiParam;
 public class UserController extends BaseController {
     @Autowired
     UserService userService;
+    @Autowired
+    MailService mailService;
+
+    /**
+     * 检查验证码
+     * TODO 限制检查次数和时间
+     * @param token 图形验证码token
+     * @param code 验证码
+     */
+    protected void checkCaptch(String token,String code){
+        Object cacheCode = redisService.getCaptch(token);
+        if (cacheCode == null){
+            throw new MyRuntimeException("请重新获取图形验证码");
+        }
+        if (!code.equals(cacheCode.toString())){
+            throw new MyRuntimeException("图形验证码错误");
+        }
+    }
+
+    @GetMapping(value = "/captch")
+    @ApiOperation(value = "/captch", notes = "验证码")
+    public ResultBean captch(HttpServletResponse response){
+        ICaptcha captcha = CaptchaUtil.createCircleCaptcha(200, 100, 4, 40);
+        byte[] imageBytes = ((CircleCaptcha) captcha).getImageBytes();
+
+        Map<String, Object> map = new HashMap<>();
+        String token = UUID.randomUUID().toString();
+        String code = captcha.getCode();
+        redisService.cacheCaptch(token,code);
+
+        map.put("token",token);
+        map.put("captch",imageBytes);
+        return ResultGenerator.getSuccessResult(map);
+    }
+
+    /**
+     * 验证邮箱验证码
+     * TODO 限制检查次数和时间
+     * @param email 邮箱
+     * @param code 验证码
+     */
+    protected void checkEmailCode(String email,String code){
+        Object cahceCode = redisService.getEmailCode(email);
+        if (cahceCode == null){
+            throw new MyRuntimeException("请重新获取邮箱验证码");
+        }
+        if (!code.equals(cahceCode.toString())){
+            throw new MyRuntimeException("邮箱验证码错误");
+        }
+    }
+
+    @PostMapping(value = "/sendEmailCode")
+    @ApiOperation(value = "/sendEmailCode", notes = "发送用户注册邮箱验证码")
+    public ResultBean sendEmailCode(@RequestBody UserEmailVO userEmailVO){
+        checkCaptch(userEmailVO.getToken(),userEmailVO.getCode());
+
+        String code = RandomUtil.randomNumbers(6);
+        //缓存邮箱验证码  邮箱key，code
+        redisService.cacheEmailCode(userEmailVO.getEmail(),code);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("code",code);
+
+        MailTemplate mailTemplate = MailTemplate.getByTemplateName(userEmailVO.getTemplateName());
+        mailService.sendTemplate(userEmailVO.getEmail(), mailTemplate,params);
+
+        return ResultGenerator.getSuccessResult("发送成功");
+    }
+
+
 
     @PostMapping(value = "/login")
     @ApiOperation(value = "/login", notes = "用户登录")
@@ -48,12 +131,16 @@ public class UserController extends BaseController {
     @PostMapping(value = "/register")
     @ApiOperation(value = "/register", notes = "用户注册")
     public ResultBean register(@RequestBody UserRegisterVO userRegisterVO){
+        //效验邮箱验证码
+        checkEmailCode(userRegisterVO.getEmail(),userRegisterVO.getEmailCode());
+
         if (!userRegisterVO.getPassword().equals(userRegisterVO.getConfirmPassword())){
             return ResultGenerator.getErrorResult("两次密码不正确");
         }
         userService.register(userRegisterVO);
         return ResultGenerator.getSuccessResult("注册成功");
     }
+
 
 
 

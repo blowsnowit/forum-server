@@ -39,7 +39,7 @@ public class ArticleController extends BaseController {
     @GetMapping("")
     @ApiOperation(value = "",notes = "获取全部文章列表")
     public ResultBean getArticles(ArticleQuery articleQuery){
-        articleQuery.setNowUserId(getUserId());
+        articleQuery.setNowUserId(getUserIdNoCheck());
 
         articleQuery.setPageOrders("a.article_id desc");
         Page page = articleQuery.createPage();
@@ -50,7 +50,7 @@ public class ArticleController extends BaseController {
     @GetMapping("/hot")
     @ApiOperation(value = "",notes = "获取热门文章列表")
     public ResultBean getHotArticles(ArticleQuery articleQuery){
-        articleQuery.setNowUserId(getUserId());
+        articleQuery.setNowUserId(getUserIdNoCheck());
         articleQuery.setPageOrders("a.article_view desc");
         Page page = articleQuery.createPage();
 
@@ -64,7 +64,7 @@ public class ArticleController extends BaseController {
     public ResultBean getArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId){
         ArticleDTO article = articleService.getArticle(articleId);
         //已被删除 且 不属于当前用户的文章
-        if (article.getArticleStatus() != 1 && !article.getUserDTO().getUserId().equals(getUserId())){
+        if (article.getArticleStatus() != 1 && !article.getUserDTO().getUserId().equals(getUserIdNoCheck())){
             return ResultGenerator.getErrorResult("当前文章已被删除");
         }
         return ResultGenerator.getSuccessResult(article);
@@ -73,7 +73,7 @@ public class ArticleController extends BaseController {
     @PostMapping("")
     @ApiOperation(value = "",notes = "发布文章")
     public ResultBean addArticle(@Valid @RequestBody ArticleVO articleVO){
-        Integer articleId = articleService.addArticle(articleVO, getUserIdCheck());
+        Integer articleId = articleService.addArticle(articleVO, getUserId());
         return ResultGenerator.getSuccessResult(articleId,"添加成功");
     }
 
@@ -82,7 +82,7 @@ public class ArticleController extends BaseController {
     @ApiOperation(value = "",notes = "编辑文章")
     public ResultBean saveArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                   @RequestBody ArticleVO articleVO){
-        articleService.saveArticle(articleId,getUserIdCheck(),articleVO);
+        articleService.saveArticle(articleId,getUserId(),articleVO);
         return ResultGenerator.getSuccessResult("编辑成功");
     }
 
@@ -90,7 +90,7 @@ public class ArticleController extends BaseController {
     @ApiOperation(value = "",notes = "修改文章状态")
     public ResultBean saveArticleStatus(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                         @ApiParam(value = "文章状态") @PathVariable Integer articleStatus){
-        articleService.saveArticleStatus(articleId,getUserIdCheck(),articleStatus);
+        articleService.saveArticleStatus(articleId,getUserId(),articleStatus);
         return ResultGenerator.getSuccessResult("删除成功");
     }
 

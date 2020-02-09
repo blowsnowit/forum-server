@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import cn.bload.forum.exception.UnLoginException;
 import cn.bload.forum.model.User;
+import cn.bload.forum.service.RedisService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.TokenUtil;
 
@@ -25,11 +26,29 @@ public class BaseController {
     protected Logger log = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    HttpServletRequest request;
+    protected HttpServletRequest request;
     @Autowired
     UserService userService;
+    @Autowired
+    protected RedisService redisService;
 
+    /**
+     * 获取用户id（会检查登录状态）
+     * @return
+     */
     protected Integer getUserId(){
+        Integer userId = getUserIdNoCheck();
+        if (userId == null){
+            throw new UnLoginException();
+        }
+        return userId;
+    }
+
+    /**
+     * 获取用户id（不检查是否存在）
+     * @return
+     */
+    protected Integer getUserIdNoCheck(){
         String token = request.getHeader("Authorization");
         if (token == null || token.equals("")){
             return null;
@@ -37,14 +56,6 @@ public class BaseController {
         Integer userId = TokenUtil.getUserId(token);
         if (userId == null){
             return null;
-        }
-        return userId;
-    }
-
-    protected Integer getUserIdCheck(){
-        Integer userId = getUserId();
-        if (userId == null){
-            throw new UnLoginException();
         }
         return userId;
     }
@@ -82,6 +93,13 @@ public class BaseController {
             }
         }
         return page;
+    }
+
+    protected void cacheSessionValue(String key,Object value){
+        request.getSession().setAttribute(key,value);
+    }
+    protected Object getCahceSessionValue(String key){
+        return request.getSession().getAttribute(key);
     }
 
 }

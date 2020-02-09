@@ -1,7 +1,10 @@
 package cn.bload.forum.service;
 
-import cn.bload.forum.model.Config;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
+
+import cn.bload.forum.model.Config;
 
 /**
  * <p>
@@ -13,4 +16,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ConfigService extends IService<Config> {
 
+    List<Config> getConfigsByType(String type);
+
+    Config getConfig(String key);
 }

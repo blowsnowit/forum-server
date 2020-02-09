@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
 import javax.annotation.Resource;
 
+import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.dao.UserMapper;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
@@ -19,6 +21,7 @@ import cn.bload.forum.entity.vo.UserUpdatePasswordVO;
 import cn.bload.forum.entity.vo.UserUpdateVO;
 import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.model.User;
+import cn.bload.forum.service.MailService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.PasswordUtil;
 import lombok.extern.log4j.Log4j2;
@@ -36,6 +39,9 @@ import lombok.extern.log4j.Log4j2;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     UserMapper userMapper;
+    @Autowired
+    MailService mailService;
+
 
     @Override
     public User findByUserName(String userName) {
@@ -59,9 +65,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user.getUserStatus() == 0){
             throw new MyRuntimeException("账号已被禁用");
         }
-        //TODO 队列发送登录邮件
-
-        return user.toUserDTO();
+        UserDTO userDTO = user.toUserDTO();
+        mailService.sendTemplate(user.getUserEmail(), MailTemplate.LOGIN,userDTO);
+        return userDTO;
     }
 
     @Override
@@ -77,14 +83,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         registerUser.setUserName(userRegisterVO.getUserName());
         registerUser.setUserNick(userRegisterVO.getUserName());
         registerUser.setUserAddTime(new Date());
+        registerUser.setUserEmail(userRegisterVO.getEmail());
 
         int result = userMapper.insert(registerUser);
         if (result <= 0){
             throw new MyRuntimeException("注册失败");
         }
 
-        //TODO 队列发送注册邮件
-
+        //TODO 队列发送注册成功邮件
+        mailService.send(userRegisterVO.getEmail(),"用户注册测试","测试内容",false);
     }
 
     @Override

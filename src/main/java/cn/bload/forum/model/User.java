@@ -45,6 +45,9 @@ public class User implements Serializable {
     @ApiModelProperty(value = "用户密码(md5加密)")
     private String userPassword;
 
+    @ApiModelProperty(value = "用户邮箱")
+    private String userEmail;
+
     @ApiModelProperty(value = "用户昵称")
     private String userNick;
 
@@ -59,6 +62,7 @@ public class User implements Serializable {
 
     @ApiModelProperty(value = "用户注册时间")
     private Date userAddTime;
+
 
     //转换为user视图对象
     public UserDTO toUserDTO(){
