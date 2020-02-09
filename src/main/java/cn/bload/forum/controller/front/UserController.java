@@ -1,6 +1,7 @@
 package cn.bload.forum.controller.front;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
 import cn.bload.forum.entity.vo.UserEmailVO;
+import cn.bload.forum.entity.vo.UserFindVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
 import cn.bload.forum.entity.vo.UserUpdateEmailVO;
@@ -60,7 +62,7 @@ public class UserController extends BaseController {
      * @param token 图形验证码token
      * @param code 验证码
      */
-    protected void checkCaptch(String token,String code){
+    private void checkCaptch(String token,String code){
         Object cacheCode = redisService.getCaptch(token);
         if (cacheCode == null){
             throw new MyRuntimeException("请重新获取图形验证码");
@@ -71,7 +73,7 @@ public class UserController extends BaseController {
     }
 
     @GetMapping(value = "/captch")
-    @ApiOperation(value = "/captch", notes = "验证码")
+    @ApiOperation(value = "/captch", notes = "获取验证码")
     public ResultBean captch(HttpServletResponse response){
         ICaptcha captcha = CaptchaUtil.createCircleCaptcha(200, 100, 4, 40);
         byte[] imageBytes = ((CircleCaptcha) captcha).getImageBytes();
@@ -93,7 +95,7 @@ public class UserController extends BaseController {
      * @param email 邮箱
      * @param code 验证码
      */
-    protected void checkEmailCode(String email,String code){
+    private void checkEmailCode(String email,String code){
         Object cahceCode = redisService.getEmailCode(email);
         if (cahceCode == null){
             throw new MyRuntimeException("请重新获取邮箱验证码");
@@ -109,15 +111,22 @@ public class UserController extends BaseController {
         checkCaptch(userEmailVO.getToken(),userEmailVO.getCode());
 
         String code = RandomUtil.randomNumbers(6);
-        //缓存邮箱验证码  邮箱key，code
-        redisService.cacheEmailCode(userEmailVO.getEmail(),code);
 
         Map<String, Object> params = new HashMap<>();
         params.put("code",code);
 
         MailTemplate mailTemplate = MailTemplate.getByTemplateName(userEmailVO.getTemplateName());
-        mailService.sendTemplate(userEmailVO.getEmail(), mailTemplate,params);
 
+        try {
+            mailService.sendTemplate(userEmailVO.getEmail(), mailTemplate, params).get();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultGenerator.getErrorResult("发送失败");
+        }
+
+        //放在下面防止邮件发送失败
+        //缓存邮箱验证码  邮箱key，code
+        redisService.cacheEmailCode(userEmailVO.getEmail(),code);
         return ResultGenerator.getSuccessResult("发送成功");
     }
 
@@ -132,7 +141,7 @@ public class UserController extends BaseController {
 
     @PostMapping(value = "/register")
     @ApiOperation(value = "/register", notes = "用户注册")
-    public ResultBean register(@RequestBody UserRegisterVO userRegisterVO){
+    public ResultBean register(@Validated @RequestBody UserRegisterVO userRegisterVO){
         //效验邮箱验证码
         checkEmailCode(userRegisterVO.getEmail(),userRegisterVO.getEmailCode());
 
@@ -141,6 +150,19 @@ public class UserController extends BaseController {
         }
         userService.register(userRegisterVO);
         return ResultGenerator.getSuccessResult("注册成功");
+    }
+
+    @PutMapping(value = "/find")
+    @ApiOperation(value = "/find", notes = "找回密码")
+    public ResultBean find(@Validated @RequestBody UserFindVO userFindVO){
+        //效验邮箱验证码
+        checkEmailCode(userFindVO.getEmail(),userFindVO.getEmailCode());
+
+        if (!userFindVO.getPassword().equals(userFindVO.getConfirmPassword())){
+            return ResultGenerator.getErrorResult("两次密码不正确");
+        }
+        UserDTO userDTO = userService.findPasswordByEmail(userFindVO);
+        return ResultGenerator.getSuccessResult(userDTO);
     }
 
 

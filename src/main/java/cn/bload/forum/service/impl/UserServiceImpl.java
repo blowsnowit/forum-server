@@ -15,6 +15,7 @@ import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.dao.UserMapper;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
+import cn.bload.forum.entity.vo.UserFindVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
 import cn.bload.forum.entity.vo.UserUpdateEmailVO;
@@ -106,6 +107,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         //TODO 队列发送注册成功邮件
         mailService.send(userRegisterVO.getEmail(),"用户注册测试","测试内容",false);
+    }
+
+    @Override
+    public UserDTO findPasswordByEmail(UserFindVO userFindVO) {
+        User user = findByUserEmail(userFindVO.getEmail());
+        if (user == null){
+            throw new MyRuntimeException("该邮箱未在本站注册");
+        }
+        User newUser = new User();
+        newUser.setUserId(user.getUserId());
+        String saltPassowrd = PasswordUtil.encodePassword(userFindVO.getPassword());
+        newUser.setUserPassword(saltPassowrd);
+        userMapper.updateById(newUser);
+        return user.toUserDTO();
     }
 
     @Override

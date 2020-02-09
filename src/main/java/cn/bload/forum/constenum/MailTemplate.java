@@ -13,12 +13,22 @@ public enum  MailTemplate {
     /**
      * 注册模板
      */
-    REGISTER("Email 地址验证","mail_template_register"),
+    REGISTER("邮箱地址验证","mail_template_register"),
 
     /**
      * 注册模板
      */
-    LOGIN("登录提醒","mail_template_login");
+    LOGIN("登录提醒","mail_template_login"),
+
+    /**
+     * 修改模板
+     */
+    EDIT("邮箱修改提醒","mail_template_edit"),
+
+    /**
+     * 找回模板
+     */
+    FIND("密码找回提醒","mail_template_find");
 
 
     @Getter

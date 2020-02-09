@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
+import cn.bload.forum.entity.vo.UserFindVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
 import cn.bload.forum.entity.vo.UserUpdateEmailVO;
@@ -37,6 +38,13 @@ public interface UserService extends IService<User> {
      */
     void register(UserRegisterVO userRegisterVO);
 
+
+    /**
+     * 通过邮箱找回密码
+     * @param userFindVO
+     */
+    UserDTO findPasswordByEmail(UserFindVO userFindVO);
+
     /**
      * 获取指定用户信息
      * @param userId 用户id
@@ -64,5 +72,7 @@ public interface UserService extends IService<User> {
      * @param userUpdateEmailVO
      */
     void updateUserEmailCheck(Integer userId, UserUpdateEmailVO userUpdateEmailVO);
+
+
 
 }

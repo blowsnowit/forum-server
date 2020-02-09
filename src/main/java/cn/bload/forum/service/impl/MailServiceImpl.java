@@ -2,6 +2,7 @@ package cn.bload.forum.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.exception.MyRuntimeException;
@@ -74,22 +76,28 @@ public class MailServiceImpl implements MailService {
 
 
     @Override
-    public String send(String to, String subject, String content, boolean isHtml){
+    public Future<String> send(String to, String subject, String content, boolean isHtml){
         MailAccount account = getMailAccount();
-        return MailUtil.send(account, to, subject, content, isHtml);
+
+        String send = MailUtil.send(account, to, subject, content, isHtml);
+        return new AsyncResult<>(send);
     }
 
 
     @Override
-    public String send(Collection<String> tos, String subject, String content, boolean isHtml){
+    public Future<String> send(Collection<String> tos, String subject, String content, boolean isHtml){
         MailAccount account = getMailAccount();
-        return MailUtil.send(account, tos, subject, content, isHtml);
+        String send = MailUtil.send(account, tos, subject, content, isHtml);
+        return new AsyncResult<>(send);
     }
 
 
     @Override
-    public String sendTemplate(String to, MailTemplate mailTemplate, Map<String, Object> params) {
+    public Future<String> sendTemplate(String to, MailTemplate mailTemplate, Map<String, Object> params) {
         if (to == null){
+            return null;
+        }
+        if (mailTemplate == null){
             return null;
         }
         //内置变量
@@ -119,7 +127,7 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public String sendTemplate(String to, MailTemplate mailTemplate, Object object) {
+    public Future<String> sendTemplate(String to, MailTemplate mailTemplate, Object object) {
         Map<String, Object> map = BeanUtil.beanToMap(object);
         return sendTemplate(to,mailTemplate,map);
     }

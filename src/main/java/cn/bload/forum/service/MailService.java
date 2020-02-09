@@ -2,6 +2,7 @@ package cn.bload.forum.service;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import cn.bload.forum.constenum.MailTemplate;
 
@@ -21,9 +22,9 @@ public interface MailService {
      * @param isHtml 是否html
      * @return
      */
-    String send(String to, String subject, String content, boolean isHtml);
+    Future<String> send(String to, String subject, String content, boolean isHtml);
 
-    String send(Collection<String> tos, String subject, String content, boolean isHtml);
+    Future<String> send(Collection<String> tos, String subject, String content, boolean isHtml);
 
     /**
      * 从配置模板中
@@ -32,7 +33,7 @@ public interface MailService {
      * @param params 变量
      * @return
      */
-    String sendTemplate(String to, MailTemplate mailTemplate, Map<String,Object> params);
+    Future<String> sendTemplate(String to, MailTemplate mailTemplate, Map<String,Object> params);
 
-    String sendTemplate(String to, MailTemplate mailTemplate, Object params);
+    Future<String> sendTemplate(String to, MailTemplate mailTemplate, Object params);
 }
