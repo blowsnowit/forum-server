@@ -20,6 +20,7 @@ import cn.bload.forum.dao.TagMapper;
 import cn.bload.forum.dao.TopicMapper;
 import cn.bload.forum.entity.dto.ArticleCommentDTO;
 import cn.bload.forum.entity.dto.ArticleDTO;
+import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.query.ArticleQuery;
 import cn.bload.forum.entity.vo.ArticleVO;
 import cn.bload.forum.exception.MyRuntimeException;
@@ -31,6 +32,7 @@ import cn.bload.forum.model.Tag;
 import cn.bload.forum.model.Topic;
 import cn.bload.forum.service.ArticleCommentService;
 import cn.bload.forum.service.ArticleService;
+import cn.bload.forum.service.RedisService;
 
 /**
  * <p>
@@ -56,10 +58,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     ArticleViewMapper articleViewMapper;
     @Resource
     ArticleCommentService articleCommentService;
+    @Resource
+    RedisService redisService;
 
     @Override
     public List<ArticleDTO> getArticles(ArticleQuery articleQuery) {
-        return articleMapper.getArticles(articleQuery);
+        List<ArticleDTO> articles = articleMapper.getArticles(articleQuery);
+
+        //设置用户在线状态
+        for (ArticleDTO article : articles) {
+            ArticleUserDTO userDTO = article.getUserDTO();
+            userDTO.setIsOnline(redisService.getUserOnline(userDTO.getUserId()));
+        }
+        return articles;
     }
 
     @Override
@@ -68,6 +79,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<ArticleCommentDTO> articleComments = articleCommentService.getArticleCommentsAuto(articleId);
         article.setArticleComments(articleComments);
+
+        //设置用户在线状态
+        ArticleUserDTO userDTO = article.getUserDTO();
+        userDTO.setIsOnline(redisService.getUserOnline(userDTO.getUserId()));
+
         return article;
     }
 

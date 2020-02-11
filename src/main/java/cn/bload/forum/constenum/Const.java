@@ -39,4 +39,14 @@ public interface Const {
     Long REDIS_CAPTCH_EXPIRE = 5 * 60L;
 
 
+    /**
+     * 缓存用户在线状态
+     */
+    String REDIS_USER_ONLINE = "cache_user_online_";
+
+    /**
+     * 缓存用户在线状态过期时间
+     * 5分钟没有请求接口 意味掉线
+     */
+    Long REDIS_USER_ONLINE_EXPIRE = 5 * 60L;
 }

@@ -23,8 +23,7 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public void cacheEmailCode(String email, String code) {
         //同时注意 邮箱验证码发送间隔时间
-        Object lastSendTime = redisOperator.get(Const.REDIS_EMAIL_CODE_TIME + email);
-        if (lastSendTime != null){
+        if (redisOperator.exists(Const.REDIS_EMAIL_CODE_TIME + email)){
             throw new MyRuntimeException("邮箱验证码发送过快");
         }
         redisOperator.set(Const.REDIS_EMAIL_CODE + email,code, Const.REDIS_EMAIL_CODE_EXPIRE);
@@ -44,6 +43,22 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Object getCaptch(String token) {
         return redisOperator.get(Const.REDIS_CAPTCH + token);
+    }
+
+    @Override
+    public void cacheUserOnline(Integer userId) {
+        redisOperator.set(Const.REDIS_USER_ONLINE + userId,1,Const.REDIS_USER_ONLINE_EXPIRE);
+    }
+
+
+    @Override
+    public void delCacheUserOnline(Integer userId) {
+        redisOperator.remove(Const.REDIS_USER_ONLINE + userId);
+    }
+
+    @Override
+    public Boolean getUserOnline(Integer userId) {
+        return redisOperator.exists(Const.REDIS_USER_ONLINE + userId);
     }
 
 }

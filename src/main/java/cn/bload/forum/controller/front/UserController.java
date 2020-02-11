@@ -165,6 +165,13 @@ public class UserController extends BaseController {
         return ResultGenerator.getSuccessResult(userDTO);
     }
 
+    @PutMapping(value = "/logout")
+    @ApiOperation(value = "/logout", notes = "登出")
+    public ResultBean logout(){
+        Integer userId = getUserId();
+        redisService.delCacheUserOnline(userId);
+        return ResultGenerator.getSuccessResult();
+    }
 
 
 
@@ -173,6 +180,9 @@ public class UserController extends BaseController {
     @ApiOperation(value = "/{userId}", notes = "获取指定用户信息")
     public ResultBean getUserInfo(@ApiParam(value = "用户id") @PathVariable Integer userId){
         ArticleUserDTO userDTO = userService.getUserInfo(userId);
+        if (userDTO == null){
+            return ResultGenerator.getErrorResult("用户不存在");
+        }
         return ResultGenerator.getSuccessResult(userDTO,"获取成功");
     }
 

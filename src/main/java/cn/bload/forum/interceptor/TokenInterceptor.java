@@ -1,5 +1,6 @@
 package cn.bload.forum.interceptor;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cn.bload.forum.annotation.NeedLogin;
 import cn.bload.forum.exception.UnLoginException;
+import cn.bload.forum.service.RedisService;
 import cn.bload.forum.utils.TokenUtil;
 
 /**
@@ -22,6 +24,8 @@ import cn.bload.forum.utils.TokenUtil;
 
 @Component
 public class TokenInterceptor extends HandlerInterceptorAdapter {
+    @Autowired
+    RedisService redisService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -35,14 +39,27 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
                     throw new UnLoginException();
                 }
             }
+
+            //更新用户在线状态
+            if (checkIsLogin(request)){
+                Integer userId = getUserId(request);
+                redisService.cacheUserOnline(userId);
+            }
         }
 
 
         return true;
     }
 
-    boolean checkIsLogin(HttpServletRequest request){
+    Integer getUserId(HttpServletRequest request){
         String token = request.getHeader("Authorization");
-        return TokenUtil.getUserId(token) != null;
+        if (token == null){
+            return null;
+        }
+        return TokenUtil.getUserId(token);
+    }
+
+    boolean checkIsLogin(HttpServletRequest request){
+        return getUserId(request) != null;
     }
 }

@@ -24,6 +24,7 @@ import cn.bload.forum.entity.vo.UserUpdateVO;
 import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.model.User;
 import cn.bload.forum.service.MailService;
+import cn.bload.forum.service.RedisService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.PasswordUtil;
 import lombok.extern.log4j.Log4j2;
@@ -43,7 +44,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     UserMapper userMapper;
     @Autowired
     MailService mailService;
-
+    @Autowired
+    RedisService redisService;
 
     @Override
     public User findByUserName(String userName) {
@@ -126,7 +128,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public ArticleUserDTO getUserInfo(Integer userId) {
         User user = userMapper.selectById(userId);
-        return user.toArticleUserDTO();
+        if (user == null){
+            return null;
+        }
+        ArticleUserDTO articleUserDTO = user.toArticleUserDTO();
+        articleUserDTO.setIsOnline(redisService.getUserOnline(userId));
+        return articleUserDTO;
     }
 
     @Override

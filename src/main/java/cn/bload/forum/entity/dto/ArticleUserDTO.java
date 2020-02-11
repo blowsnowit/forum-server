@@ -33,4 +33,7 @@ public class ArticleUserDTO {
 
     @ApiModelProperty(value = "用户头像")
     private String userFace;
+
+    @ApiModelProperty(value = "用户在线状态")
+    private Boolean isOnline;
 }
