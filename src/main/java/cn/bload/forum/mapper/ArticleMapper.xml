@@ -22,6 +22,7 @@
         <result column="article_update_time" property="articleUpdateTime" />
         <result column="article_status" property="articleStatus" />
         <result column="article_view" property="articleView" />
+        <result column="article_comment_count" property="articleCommentCount" />
         <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
         </association>
         <collection property="articleTopics" column="article_id" select="cn.bload.forum.dao.ArticleTopicMapper.selectTopicByArticleId">
@@ -45,13 +46,15 @@
         u.user_nick user_user_nick,
         u.user_desc user_user_desc,
         u.user_add_time user_user_add_time,
-        u.user_face user_user_face
+        u.user_face user_user_face,
+        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id) article_comment_count
         from forum_article a
         left join forum_user u on u.user_id = a.user_id
         left join forum_article_tag atg on atg.article_id = a.article_id
         left join forum_tag tg on tg.tag_id = atg.tag_id
         left join forum_article_topic atp on atp.article_id = a.article_id
         left join forum_topic tp on tp.topic_id = atp.topic_id
+
         <where>
             <if test="userId != null">
                 and a.user_id = #{userId}
@@ -85,8 +88,7 @@
         u.user_desc user_user_desc,
         u.user_add_time user_user_add_time,
         u.user_face user_user_face,
-        GROUP_CONCAT(DISTINCT tg.tag_name order by atg.article_tag_id SEPARATOR ',') articleTags,
-        GROUP_CONCAT(DISTINCT tp.topic_name order by atp.article_topic_id  SEPARATOR ',') articleTopics
+        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id) article_comment_count
         from forum_article a
         left join forum_user u on u.user_id = a.user_id
         left join forum_article_tag atg on atg.article_id = a.article_id

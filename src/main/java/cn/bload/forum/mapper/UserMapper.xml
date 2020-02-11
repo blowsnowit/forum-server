@@ -11,6 +11,7 @@
         <result column="user_desc" property="userDesc" />
         <result column="user_status" property="userStatus" />
         <result column="user_face" property="userFace" />
+        <result column="user_add_time" property="userAddTime" />
     </resultMap>
 
     <resultMap id="ArticleUserDTOMap" type="cn.bload.forum.entity.dto.ArticleUserDTO">
@@ -19,6 +20,7 @@
         <result column="user_nick" property="userNick" />
         <result column="user_desc" property="userDesc" />
         <result column="user_face" property="userFace" />
+        <result column="user_add_time" property="userAddTime" />
     </resultMap>
 
 </mapper>

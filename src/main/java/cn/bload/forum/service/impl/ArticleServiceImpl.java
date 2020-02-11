@@ -18,6 +18,7 @@ import cn.bload.forum.dao.ArticleTopicMapper;
 import cn.bload.forum.dao.ArticleViewMapper;
 import cn.bload.forum.dao.TagMapper;
 import cn.bload.forum.dao.TopicMapper;
+import cn.bload.forum.entity.dto.ArticleCommentDTO;
 import cn.bload.forum.entity.dto.ArticleDTO;
 import cn.bload.forum.entity.query.ArticleQuery;
 import cn.bload.forum.entity.vo.ArticleVO;
@@ -28,6 +29,7 @@ import cn.bload.forum.model.ArticleTopic;
 import cn.bload.forum.model.ArticleView;
 import cn.bload.forum.model.Tag;
 import cn.bload.forum.model.Topic;
+import cn.bload.forum.service.ArticleCommentService;
 import cn.bload.forum.service.ArticleService;
 
 /**
@@ -52,7 +54,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     TagMapper tagMapper;
     @Resource
     ArticleViewMapper articleViewMapper;
-
+    @Resource
+    ArticleCommentService articleCommentService;
 
     @Override
     public List<ArticleDTO> getArticles(ArticleQuery articleQuery) {
@@ -61,7 +64,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public ArticleDTO getArticle(Integer articleId) {
-        return articleMapper.getArticle(articleId);
+        ArticleDTO article = articleMapper.getArticle(articleId);
+
+        List<ArticleCommentDTO> articleComments = articleCommentService.getArticleCommentsAuto(articleId);
+        article.setArticleComments(articleComments);
+        return article;
     }
 
     @Override

@@ -38,6 +38,9 @@ public class ArticleDTO {
     @ApiModelProperty(value = "文章阅览次数")
     private Integer articleView;
 
+    @ApiModelProperty(value = "文章评论数量")
+    private Integer articleCommentCount;
+
     @ApiModelProperty(value = "文章作者")
     private ArticleUserDTO userDTO;
 
@@ -48,4 +51,6 @@ public class ArticleDTO {
     private List<String> articleTags;
 
 
+    @ApiModelProperty(value = "文章评论列表")
+    private List<ArticleCommentDTO> articleComments;
 }
