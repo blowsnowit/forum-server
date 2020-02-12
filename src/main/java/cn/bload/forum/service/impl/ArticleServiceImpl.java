@@ -84,6 +84,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleUserDTO userDTO = article.getUserDTO();
         userDTO.setIsOnline(redisService.getUserOnline(userDTO.getUserId()));
 
+        for (ArticleCommentDTO articleComment : articleComments) {
+            articleComment.getUserDTO().setIsOnline(redisService.getUserOnline(articleComment.getUserDTO().getUserId()));
+        }
+
         return article;
     }
 
