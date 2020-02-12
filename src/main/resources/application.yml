@@ -26,3 +26,11 @@ mybatis-plus:
   configuration:
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+# 自定义文件上传路径
+web:
+  # 访问路径
+  path: upload
+  # 上传路径
+  upload-path: E:\临时目录\upload\

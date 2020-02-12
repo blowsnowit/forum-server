@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 
+import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.exception.UnLoginException;
 import cn.bload.forum.model.User;
 import cn.bload.forum.service.RedisService;
@@ -102,4 +103,41 @@ public class BaseController {
         return request.getSession().getAttribute(key);
     }
 
+
+
+
+    /**
+     * 检查验证码
+     * TODO 限制检查次数和时间
+     * @param token 图形验证码token
+     * @param code 验证码
+     */
+    protected void checkCaptch(String token,String code){
+        Object cacheCode = redisService.getCaptch(token);
+        if (cacheCode == null){
+            throw new MyRuntimeException("请重新获取图形验证码");
+        }
+        if (!code.equals(cacheCode.toString())){
+            throw new MyRuntimeException("图形验证码错误");
+        }
+    }
+
+
+
+    /**
+     * 验证邮箱验证码
+     * TODO 限制检查次数和时间
+     * TODO 考虑是否只能使用一次验证码
+     * @param email 邮箱
+     * @param code 验证码
+     */
+    protected void checkEmailCode(String email,String code){
+        Object cahceCode = redisService.getEmailCode(email);
+        if (cahceCode == null){
+            throw new MyRuntimeException("请重新获取邮箱验证码");
+        }
+        if (!code.equals(cahceCode.toString())){
+            throw new MyRuntimeException("邮箱验证码错误");
+        }
+    }
 }
