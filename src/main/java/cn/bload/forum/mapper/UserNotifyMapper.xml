@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.UserNotifyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.UserNotify">
+        <id column="user_notify_id" property="userNotifyId" />
+        <result column="target" property="target" />
+        <result column="target_type" property="targetType" />
+        <result column="user_id" property="userId" />
+        <result column="content" property="content" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <select id="getNotifys" resultType="cn.bload.forum.entity.dto.UserNotifyDTO">
+        select
+        un.*,
+        IF(ISNULL(unr.user_notify_read_id),0,1) isRead,
+        unr.read_time
+        from forum_user_notify un
+        left join forum_user_notify_read unr on unr.user_notify_id = un.user_notify_id
+        where
+        ( un.user_id = #{nowUserId} or un.user_id = 0)
+        -- 未读
+        <if test="readStatus == 0">
+          and unr.user_notify_read_id is null
+        </if>
+        -- 已读
+        <if test="readStatus == 1">
+            and unr.user_notify_read_id is not null
+        </if>
+        order by un.create_time desc
+    </select>
+
+    <select id="getUnReadNotifyNum" resultType="java.lang.Integer">
+        select
+        count(un.user_notify_id) num
+        from forum_user_notify un
+        left join forum_user_notify_read unr on unr.user_notify_id = un.user_notify_id
+        where
+        ( un.user_id = #{userId} or un.user_id = 0)
+        -- 未读
+        and unr.user_notify_read_id is null
+    </select>
+
+</mapper>

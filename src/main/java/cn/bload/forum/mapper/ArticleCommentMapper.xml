@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.ArticleCommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.ArticleComment">
+        <id column="article_comment_id" property="articleCommentId" />
+        <result column="parent_article_comment_id" property="parentArticleCommentId" />
+        <result column="article_id" property="articleId" />
+        <result column="user_id" property="userId" />
+        <result column="article_comment" property="articleComment" />
+        <result column="article_comment_time" property="articleCommentTime" />
+    </resultMap>
+
+    <resultMap id="ArticleCommentDTOResultMap" type="cn.bload.forum.entity.dto.ArticleCommentDTO">
+        <id column="article_comment_id" property="articleCommentId" />
+        <result column="parent_article_comment_id" property="parentArticleCommentId" />
+        <result column="article_id" property="articleId" />
+        <result column="article_comment" property="articleComment" />
+        <result column="article_comment_time" property="articleCommentTime" />
+
+        <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
+        </association>
+    </resultMap>
+
+    <select id="getArticleComments" resultMap="ArticleCommentDTOResultMap">
+        select
+        ac.*,
+        u.user_id user_user_id,
+        u.user_name user_user_name,
+        u.user_nick user_user_nick,
+        u.user_desc user_user_desc,
+        u.user_add_time user_user_add_time,
+        u.user_face user_user_face
+        from forum_article_comment ac
+        left join forum_user u on u.user_id = ac.user_id
+        where article_id = #{articleId}
+    </select>
+
+    <select id="getArticleComment" resultMap="ArticleCommentDTOResultMap">
+        select
+        ac.*,
+        u.user_id user_user_id,
+        u.user_name user_user_name,
+        u.user_nick user_user_nick,
+        u.user_desc user_user_desc,
+        u.user_add_time user_user_add_time,
+        u.user_face user_user_face
+        from forum_article_comment ac
+        left join forum_user u on u.user_id = ac.user_id
+        where article_comment_id = #{articleCommentId}
+    </select>
+
+</mapper>
