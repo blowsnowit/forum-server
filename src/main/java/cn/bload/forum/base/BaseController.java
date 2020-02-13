@@ -13,6 +13,7 @@ import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.exception.UnLoginException;
 import cn.bload.forum.model.User;
 import cn.bload.forum.service.RedisService;
+import cn.bload.forum.service.UserNotifyService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.TokenUtil;
 
@@ -33,12 +34,19 @@ public class BaseController {
     @Autowired
     protected RedisService redisService;
 
+    @Autowired
+    protected UserNotifyService userNotifyService;
+
     /**
-     * 获取用户id（会检查登录状态）
+     * 获取用户id
      * @return
      */
     protected Integer getUserId(){
-        Integer userId = getUserIdNoCheck();
+        String token = request.getHeader("Authorization");
+        if (token == null || token.equals("")){
+            throw new UnLoginException();
+        }
+        Integer userId = TokenUtil.getUserId(token);
         if (userId == null){
             throw new UnLoginException();
         }
@@ -46,17 +54,16 @@ public class BaseController {
     }
 
     /**
-     * 获取用户id（不检查是否存在）
+     * 获取用户id(不检测登录状态)
      * @return
      */
     protected Integer getUserIdNoCheck(){
-        String token = request.getHeader("Authorization");
-        if (token == null || token.equals("")){
-            return null;
-        }
-        Integer userId = TokenUtil.getUserId(token);
-        if (userId == null){
-            return null;
+        Integer userId = null;
+        try {
+            userId = getUserId();
+        }catch (UnLoginException e){
+            //允许未登录的用户获取文章列表
+            //所以这里只是捕获获取用户id的异常
         }
         return userId;
     }

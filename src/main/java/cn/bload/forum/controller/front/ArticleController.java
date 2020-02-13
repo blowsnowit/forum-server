@@ -63,7 +63,7 @@ public class ArticleController extends BaseController {
     @ApiOperation(value = "/{articleId}",notes = "/获取指定文章")
     public ResultBean getArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId){
         ArticleDTO article = articleService.getArticle(articleId);
-        //已被删除 且 不属于当前用户的文章
+
         if (article.getArticleStatus() != 1 && !article.getUserDTO().getUserId().equals(getUserIdNoCheck())){
             return ResultGenerator.getErrorResult("当前文章已被删除");
         }

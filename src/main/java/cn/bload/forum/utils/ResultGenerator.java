@@ -1,6 +1,8 @@
 package cn.bload.forum.utils;
 
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+
 import cn.bload.forum.base.ResultBean;
 import cn.bload.forum.constenum.Result;
 
@@ -53,7 +55,10 @@ public class ResultGenerator {
     }
 
     public static ResultBean getUnLoginResult(String message){
-        return getResult(Result.NOLOGIN.getCode(),Result.NOLOGIN.getMessage(),null);
+        if (StringUtils.isBlank(message)){
+            message = Result.NOLOGIN.getMessage();
+        }
+        return getResult(Result.NOLOGIN.getCode(),message,null);
     }
 
     public static <T> ResultBean<T> getResult(Result result,T data){

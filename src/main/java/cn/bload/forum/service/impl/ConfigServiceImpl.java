@@ -3,6 +3,7 @@ package cn.bload.forum.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     ConfigMapper configMapper;
 
     @Override
+    @Cacheable(value = "cache_configs",key = "'cache_configs_' + #type")
     public List<Config> getConfigsByType(String type) {
         QueryWrapper<Config> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Config::getConfigType,type);

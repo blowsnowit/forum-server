@@ -1,5 +1,7 @@
 package cn.bload.forum.interceptor;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -53,7 +55,7 @@ public class TokenInterceptor extends HandlerInterceptorAdapter {
 
     Integer getUserId(HttpServletRequest request){
         String token = request.getHeader("Authorization");
-        if (token == null){
+        if (StringUtils.isBlank(token)){
             return null;
         }
         return TokenUtil.getUserId(token);

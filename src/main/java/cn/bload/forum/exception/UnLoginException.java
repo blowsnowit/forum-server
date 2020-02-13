@@ -7,5 +7,9 @@ package cn.bload.forum.exception;
  * @describe 类描述:
  */
 public class UnLoginException extends RuntimeException {
-
+    public UnLoginException() {
+    }
+    public UnLoginException(String message) {
+        super(message);
+    }
 }

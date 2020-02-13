@@ -49,4 +49,6 @@ public interface Const {
      * 5分钟没有请求接口 意味掉线
      */
     Long REDIS_USER_ONLINE_EXPIRE = 5 * 60L;
+
+
 }

@@ -15,7 +15,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
  */
 public class TokenUtil {
     private static final String SLAT = "blowsnowforum";
-    private static final int EXPIRE_TIME =  30 * 12 * 60 * 1000;
+    private static final long EXPIRE_TIME =  7 * 24 * 60 * 60 * 1000;
 
     public static String getToken(User user) {
         // 将 user id 保存到 token 里面

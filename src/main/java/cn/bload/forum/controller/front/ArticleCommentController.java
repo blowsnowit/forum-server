@@ -15,6 +15,7 @@ import cn.bload.forum.base.ResultBean;
 import cn.bload.forum.entity.ArticleCommentEditVO;
 import cn.bload.forum.entity.vo.ArticleCommentAddVO;
 import cn.bload.forum.service.ArticleCommentService;
+import cn.bload.forum.service.UserNotifyService;
 import cn.bload.forum.utils.ResultGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +40,10 @@ public class ArticleCommentController extends BaseController {
     public ResultBean addArticleComment(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                         @Validated @RequestBody ArticleCommentAddVO articleCommentAddVO){
 
-        articleCommentService.addArticleCommentBeforeCheck(getUserId(),articleId,articleCommentAddVO);
+        Integer commendId = articleCommentService.addArticleCommentBeforeCheck(getUserId(), articleId, articleCommentAddVO);
+
+        //推送评论给文章作者
+        userNotifyService.pushCommentNotify(commendId);
         return ResultGenerator.getSuccessResult("评论成功");
     }
 

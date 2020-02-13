@@ -46,6 +46,8 @@ public class UserController extends BaseController {
     @ApiOperation(value = "/login", notes = "用户登录")
     public ResultBean<UserDTO> login(@Valid @RequestBody UserLoginVO userLoginVO){
         UserDTO userDTO = userService.login(userLoginVO);
+
+        userNotifyService.pushUserLoginNotify(request,userDTO);
         return ResultGenerator.getSuccessResult(userDTO);
     }
 
