@@ -41,4 +41,6 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         queryWrapper.lambda().eq(Config::getConfigKey,key);
         return configMapper.selectOne(queryWrapper);
     }
+
+    //TODO 保存配置，记得清楚缓存
 }
