@@ -37,6 +37,9 @@ public class ArticleVO {
     @ApiModelProperty(value = "文章状态(1正常 0删除)")
     private Integer articleStatus;
 
+    @ApiModelProperty(value = "置顶文章 0取消置顶(管理员使用)",hidden = true)
+    private Integer articleTop;
+
     public Article toArticle(){
         Article article = new Article();
         BeanUtils.copyProperties(this,article);

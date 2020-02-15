@@ -36,5 +36,17 @@ public class Config implements Serializable {
     @ApiModelProperty(value = "归类类型")
     private String configType;
 
+    @ApiModelProperty(value = "输入提示")
+    private String configInputTip;
 
+    @ApiModelProperty(value = "输入类型: string,number,editor,boolean")
+    private String configInputType;
+
+    public String getConfigValue() {
+        return configValue;
+    }
+
+    public void setConfigValue(String configValue) {
+        this.configValue = configValue;
+    }
 }

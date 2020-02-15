@@ -23,4 +23,19 @@
         <result column="user_add_time" property="userAddTime" />
     </resultMap>
 
+    <select id="getUserList" resultType="cn.bload.forum.model.User">
+        select * from forum_user
+        <where>
+            <if test="userName != null">
+                and user_name = #{userName}
+            </if>
+            <if test="userNick != null">
+                and user_nick = #{userNick}
+            </if>
+            <if test="userEmail != null">
+                and user_email = #{userEmail}
+            </if>
+        </where>
+    </select>
+
 </mapper>

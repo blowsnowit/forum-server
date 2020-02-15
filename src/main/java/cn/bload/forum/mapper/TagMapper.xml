@@ -9,4 +9,15 @@
         <result column="tag_add_time" property="tagAddTime" />
     </resultMap>
 
+
+    <select id="getHotTags" resultType="cn.bload.forum.entity.dto.TagDTO">
+      SELECT
+            ft.*,count(fat.article_id) as articleNum
+        FROM
+            forum_tag ft
+            LEFT JOIN forum_article_tag fat ON fat.tag_id = ft.tag_id
+            GROUP BY ft.tag_id
+            order by articleNum desc
+    </select>
+
 </mapper>

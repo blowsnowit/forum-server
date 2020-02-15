@@ -5,16 +5,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
-import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.dao.UserMapper;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
+import cn.bload.forum.entity.query.UserQuery;
 import cn.bload.forum.entity.vo.UserFindVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
@@ -25,6 +27,7 @@ import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.model.User;
 import cn.bload.forum.service.MailService;
 import cn.bload.forum.service.RedisService;
+import cn.bload.forum.service.UserNotifyService;
 import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.PasswordUtil;
 import lombok.extern.log4j.Log4j2;
@@ -44,6 +47,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     UserMapper userMapper;
     @Autowired
     MailService mailService;
+    @Autowired
+    UserNotifyService userNotifyService;
     @Autowired
     RedisService redisService;
 
@@ -77,7 +82,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new MyRuntimeException("账号已被禁用");
         }
         UserDTO userDTO = user.toUserDTO();
-        mailService.sendTemplate(user.getUserEmail(), MailTemplate.LOGIN,userDTO);
+
+        userNotifyService.pushUserLoginNotify(userDTO);
         return userDTO;
     }
 
@@ -137,6 +143,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public void updateUserInfo(User user) {
+        if (user.getUserId() == null){
+            throw new MyRuntimeException("用户id不存在");
+        }
+        if (user.getUserPassword() != null){
+            String saltPassowrd = PasswordUtil.encodePassword(user.getUserPassword());
+            user.setUserPassword(saltPassowrd);
+        }
+        int result = userMapper.updateById(user);
+        if (result != 1){
+            throw new MyRuntimeException("修改失败");
+        }
+    }
+
+    @Override
     public void updateUserInfo(Integer userId, UserUpdateVO userUpdateVO) {
         User user = userUpdateVO.toUser();
         user.setUserId(userId);
@@ -158,11 +179,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!user.getUserPassword().equals(oldSaltPassowrd)){
             throw new MyRuntimeException("旧密码不正确");
         }
-        String saltPassowrd = PasswordUtil.encodePassword(userUpdatePasswordVO.getNewUserPassword());
+
         User newUser = new User();
         newUser.setUserId(userId);
-        newUser.setUserPassword(saltPassowrd);
-        userMapper.updateById(newUser);
+        newUser.setUserPassword(userUpdatePasswordVO.getNewUserPassword());
+        updateUserInfo(newUser);
     }
 
     @Override
@@ -184,6 +205,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User newUser = new User();
         newUser.setUserId(userId);
         newUser.setUserEmail(userUpdateEmailVO.getEmail());
-        userMapper.updateById(newUser);
+
+        updateUserInfo(newUser);
     }
+
+    @Override
+    @Cacheable(value = "cache_op",key = "'userid_' + #userId")
+    public boolean isOp(Integer userId) {
+        User user = userMapper.selectById(userId);
+        return user.getUserOp() == 1;
+    }
+
+    @Override
+    public List<User> getUserList(UserQuery userQuery) {
+        return userMapper.getUserList(userQuery);
+    }
+
+    @Override
+    public void saveUserStatus(Integer userId, Integer userStatus) {
+        User user = new User();
+        user.setUserId(userId);
+        user.setUserStatus(userStatus);
+
+        updateUserInfo(user);
+    }
+
 }

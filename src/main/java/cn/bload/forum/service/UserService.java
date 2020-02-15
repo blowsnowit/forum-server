@@ -2,8 +2,11 @@ package cn.bload.forum.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
+import cn.bload.forum.entity.query.UserQuery;
 import cn.bload.forum.entity.vo.UserFindVO;
 import cn.bload.forum.entity.vo.UserLoginVO;
 import cn.bload.forum.entity.vo.UserRegisterVO;
@@ -52,8 +55,16 @@ public interface UserService extends IService<User> {
      */
     ArticleUserDTO getUserInfo(Integer userId);
 
+
     /**
      * 更新用户信息
+     * 自动处理密码加密
+     * @param user
+     */
+    void updateUserInfo(User user);
+
+    /**
+     * 更新用户基础资料信息
      * @param userId
      * @param userUpdateVO
      */
@@ -73,6 +84,27 @@ public interface UserService extends IService<User> {
      */
     void updateUserEmailCheck(Integer userId, UserUpdateEmailVO userUpdateEmailVO);
 
+
+    /**
+     * 判断改用户是否是管理员
+     * @param userId 用户id
+     * @return
+     */
+    boolean isOp(Integer userId);
+
+    /**
+     * 获取用户列表
+     * @param userQuery
+     * @return
+     */
+    List<User> getUserList(UserQuery userQuery);
+
+    /**
+     * 修改用户状态
+     * @param userId 用户id
+     * @param userStatus 用户状态
+     */
+    void saveUserStatus(Integer userId, Integer userStatus);
 
 
 }

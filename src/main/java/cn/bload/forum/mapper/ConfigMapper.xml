@@ -9,4 +9,19 @@
         <result column="config_type" property="configType" />
     </resultMap>
 
+    <update id="saveConfigs" parameterType="cn.bload.forum.model.Config">
+        <foreach collection="configs" item="it">
+            update forum_config set config_value = ${it.configValue} where config_key = #{it.configKey};
+        </foreach>
+    </update>
+
+    <update id="saveConfig">
+        update forum_config set config_value = ${configValue} where config_key = #{configKey};
+    </update>
+
+    <select id="getConfigTypes" resultType="java.lang.String">
+        select config_type from forum_config
+        group by config_type
+    </select>
+
 </mapper>

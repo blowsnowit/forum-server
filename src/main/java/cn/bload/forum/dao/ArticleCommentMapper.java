@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import java.util.List;
 
 import cn.bload.forum.entity.dto.ArticleCommentDTO;
+import cn.bload.forum.entity.query.CommentQuery;
 import cn.bload.forum.model.ArticleComment;
 
 /**
@@ -20,4 +21,7 @@ public interface ArticleCommentMapper extends BaseMapper<ArticleComment> {
     List<ArticleCommentDTO> getArticleComments(Integer articleId);
 
     ArticleCommentDTO getArticleComment(Integer articleCommentId);
+
+    List<ArticleCommentDTO> getArticleCommentsOp(CommentQuery commentQuery);
+
 }

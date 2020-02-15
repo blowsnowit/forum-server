@@ -63,6 +63,8 @@ public class User implements Serializable {
     @ApiModelProperty(value = "用户注册时间")
     private Date userAddTime;
 
+    @ApiModelProperty(value = "是否是管理员 1是 0不是")
+    private Integer userOp;
 
     //转换为user视图对象
     public UserDTO toUserDTO(){

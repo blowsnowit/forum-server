@@ -2,7 +2,7 @@ package cn.bload.forum.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,6 +47,8 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
     ArticleMapper articleMapper;
     @Resource
     ArticleCommentMapper articleCommentMapper;
+    @Autowired
+    protected HttpServletRequest request;
 
     @Override
     public List<UserNotifyDTO> getNotifys(NotifyQuery notifyQuery) {
@@ -140,7 +142,7 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
     }
 
     @Override
-    public void pushUserLoginNotify(HttpServletRequest request, UserDTO userDTO) {
+    public void pushUserLoginNotify(UserDTO userDTO) {
 
         String ipAddr = IpUtil.getIpAddr(request);
         String time = DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss");

@@ -21,10 +21,11 @@
 
         <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
         </association>
+
+        <association property="articleDTO" column="article_id" select="cn.bload.forum.dao.ArticleMapper.getArticle" />
     </resultMap>
 
-    <select id="getArticleComments" resultMap="ArticleCommentDTOResultMap">
-        select
+    <sql id="ArticleCommentDTOSelect">
         ac.*,
         u.user_id user_user_id,
         u.user_name user_user_name,
@@ -32,6 +33,11 @@
         u.user_desc user_user_desc,
         u.user_add_time user_user_add_time,
         u.user_face user_user_face
+    </sql>
+
+    <select id="getArticleComments" resultMap="ArticleCommentDTOResultMap">
+        select
+        <include refid="ArticleCommentDTOSelect" />
         from forum_article_comment ac
         left join forum_user u on u.user_id = ac.user_id
         where article_id = #{articleId}
@@ -39,16 +45,23 @@
 
     <select id="getArticleComment" resultMap="ArticleCommentDTOResultMap">
         select
-        ac.*,
-        u.user_id user_user_id,
-        u.user_name user_user_name,
-        u.user_nick user_user_nick,
-        u.user_desc user_user_desc,
-        u.user_add_time user_user_add_time,
-        u.user_face user_user_face
+        <include refid="ArticleCommentDTOSelect" />
         from forum_article_comment ac
         left join forum_user u on u.user_id = ac.user_id
         where article_comment_id = #{articleCommentId}
+    </select>
+
+
+    <select id="getArticleCommentsOp" resultMap="ArticleCommentDTOResultMap">
+        select
+        <include refid="ArticleCommentDTOSelect" />
+        from forum_article_comment ac
+        left join forum_user u on u.user_id = ac.user_id
+        <where>
+            <if test="articleId != null">
+                article_id = #{articleId}
+            </if>
+        </where>
     </select>
 
 </mapper>

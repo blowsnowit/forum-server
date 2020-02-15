@@ -24,7 +24,7 @@
 
     <select id="getHotTopics" resultType="cn.bload.forum.entity.dto.TopicDTO">
         SELECT
-            ft.*,count(fat.topic_id) as articleNum
+            ft.*,count(fat.article_id) as articleNum
         FROM
             forum_topic ft
             LEFT JOIN forum_article_topic fat ON fat.topic_id = ft.topic_id

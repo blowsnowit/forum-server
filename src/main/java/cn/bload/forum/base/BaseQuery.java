@@ -22,6 +22,9 @@ import lombok.Data;
 @Data
 @ApiModel("基础搜索对象")
 public class BaseQuery {
+    @ApiModelProperty("搜索关键词")
+    private String searchWord;
+
     @ApiModelProperty("分页数量")
     private Long pageSize;
 

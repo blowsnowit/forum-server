@@ -8,12 +8,11 @@ import lombok.EqualsAndHashCode;
 /**
  * @author 作者 : blownsow
  * @version 版本: 1.0
- * @date 创建时间 : 2020/2/6 16:50
+ * @date 创建时间 : 2020/2/15 15:27
  * @describe 类描述:
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@ApiModel("话题搜索对象")
-public class TopicQuery extends BaseQuery {
-
+@ApiModel("标签搜索对象")
+public class TagQuery extends BaseQuery {
 }

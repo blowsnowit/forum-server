@@ -13,6 +13,7 @@ import javax.annotation.Resource;
 import cn.bload.forum.dao.ArticleCommentMapper;
 import cn.bload.forum.dao.ArticleMapper;
 import cn.bload.forum.entity.dto.ArticleCommentDTO;
+import cn.bload.forum.entity.query.CommentQuery;
 import cn.bload.forum.entity.vo.ArticleCommentAddVO;
 import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.model.Article;
@@ -121,5 +122,10 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
             throw new MyRuntimeException("不能修改此评论");
         }
         articleCommentMapper.deleteById(articleCommentId);
+    }
+
+    @Override
+    public List<ArticleCommentDTO> getComments(CommentQuery commentQuery) {
+        return articleCommentMapper.getArticleCommentsOp(commentQuery);
     }
 }

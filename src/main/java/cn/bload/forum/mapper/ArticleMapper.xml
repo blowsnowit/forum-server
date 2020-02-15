@@ -23,6 +23,7 @@
         <result column="article_status" property="articleStatus" />
         <result column="article_view" property="articleView" />
         <result column="article_comment_count" property="articleCommentCount" />
+        <result column="article_top" property="articleTop" />
         <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
         </association>
         <collection property="articleTopics" column="article_id" select="cn.bload.forum.dao.ArticleTopicMapper.selectTopicByArticleId">
@@ -56,6 +57,7 @@
         left join forum_topic tp on tp.topic_id = atp.topic_id
 
         <where>
+            1 = 1
             <if test="userId != null">
                 and a.user_id = #{userId}
             </if>
@@ -65,17 +67,21 @@
             <if test="topicName != null">
                 and tp.topic_name = #{topicName}
             </if>
-            <if test="nowUserId != null">
-                and IF(a.user_id = #{nowUserId}, 1 = 1,a.article_status = 1)
+            <if test="!op">
+                <if test="nowUserId != null">
+                    and IF(a.user_id = #{nowUserId}, 1 = 1,a.article_status = 1)
+                </if>
+                <if test="nowUserId == null">
+                    and a.article_status = 1
+                </if>
             </if>
-            <if test="nowUserId == null">
-                and a.article_status = 1
-            </if>
+
             -- 搜索需要优化
             <if test="search != null">
                 and a.article_title like concat(#{search},'%')
             </if>
         </where>
+
         GROUP BY a.article_id
     </select>
 

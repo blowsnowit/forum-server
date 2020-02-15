@@ -2,6 +2,9 @@ package cn.bload.forum.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
+import cn.bload.forum.entity.query.UserQuery;
 import cn.bload.forum.model.User;
 
 /**
@@ -13,5 +16,7 @@ import cn.bload.forum.model.User;
  * @since 2020-01-18
  */
 public interface UserMapper extends BaseMapper<User> {
+
+    List<User> getUserList(UserQuery userQuery);
 
 }

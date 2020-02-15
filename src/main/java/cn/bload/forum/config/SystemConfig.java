@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import cn.bload.forum.interceptor.AdminInterceptor;
 import cn.bload.forum.interceptor.TokenInterceptor;
 
 /**
@@ -22,6 +23,8 @@ public class SystemConfig implements WebMvcConfigurer {
 
     @Autowired
     TokenInterceptor tokenInterceptor;
+    @Autowired
+    AdminInterceptor adminInterceptor;
 
     @Value("${web.path}")
     private String path;
@@ -32,6 +35,7 @@ public class SystemConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor). addPathPatterns("/api/**");
+        registry.addInterceptor(adminInterceptor). addPathPatterns("/api/admin/**");
     }
 
     @Override

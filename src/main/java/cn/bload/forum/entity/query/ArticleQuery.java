@@ -31,4 +31,7 @@ public class ArticleQuery extends BaseQuery {
 
     @ApiModelProperty(value = "搜索文章标题")
     private String search;
+
+    @ApiModelProperty(value = "是否是管理员", hidden = true)
+    private boolean op;
 }

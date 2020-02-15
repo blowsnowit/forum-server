@@ -1,7 +1,12 @@
 package cn.bload.forum.service;
 
-import cn.bload.forum.model.Tag;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
+
+import cn.bload.forum.entity.dto.TagDTO;
+import cn.bload.forum.entity.query.TagQuery;
+import cn.bload.forum.model.Tag;
 
 /**
  * <p>
@@ -12,5 +17,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2020-01-20
  */
 public interface TagService extends IService<Tag> {
+
+    List<TagDTO> getHotTags(TagQuery tagQuery);
 
 }

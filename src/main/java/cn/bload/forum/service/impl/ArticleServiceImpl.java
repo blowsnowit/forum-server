@@ -63,6 +63,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public List<ArticleDTO> getArticles(ArticleQuery articleQuery) {
+        articleQuery.setOp(false);
         List<ArticleDTO> articles = articleMapper.getArticles(articleQuery);
 
         //设置用户在线状态
@@ -71,6 +72,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             userDTO.setIsOnline(redisService.getUserOnline(userDTO.getUserId()));
         }
         return articles;
+    }
+
+    @Override
+    public List<ArticleDTO> getOpArticles(ArticleQuery articleQuery) {
+        articleQuery.setOp(true);
+        return articleMapper.getArticles(articleQuery);
     }
 
     @Override
@@ -99,13 +106,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
     }
 
-    @Override
-    public void saveArticle(Article article) {
-        int result = articleMapper.updateById(article);
-        if (result == 0){
-            throw new MyRuntimeException("添加失败");
-        }
-    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -122,25 +123,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
-    public void saveArticle(Integer articleId, Integer userId,ArticleVO articleVO) {
-        ArticleDTO articleDTO = this.getArticle(articleId);
-        if (articleDTO == null){
-            throw new MyRuntimeException("当前文章不存在");
-        }
-        //验证文章归属的用户
-        if (!articleDTO.getUserDTO().getUserId().equals(userId)){
-            throw new MyRuntimeException("当前文章不属于你的，不允许编辑");
-        }
+    public void saveArticle(Integer articleId,ArticleVO articleVO) {
         Article article = articleVO.toArticle();
         article.setArticleId(articleId);
         article.setArticleUpdateTime(new Date());
-        saveArticle(article);
+        int result = articleMapper.updateById(article);
+        if (result != 1){
+            throw new MyRuntimeException("更新失败");
+        }
 
         doArticleTopicAndTag(articleId,articleVO);
     }
 
     @Override
-    public void saveArticleStatus(Integer articleId, Integer userId, Integer articleStatus) {
+    public void saveArticleBeforeCheck(Integer articleId, Integer userId, ArticleVO articleVO) {
         ArticleDTO articleDTO = this.getArticle(articleId);
         if (articleDTO == null){
             throw new MyRuntimeException("当前文章不存在");
@@ -149,6 +145,25 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (!articleDTO.getUserDTO().getUserId().equals(userId)){
             throw new MyRuntimeException("当前文章不属于你的，不允许编辑");
         }
+
+        saveArticle(articleId,articleVO);
+    }
+
+    @Override
+    public void saveArticleStatusBeforeCheck(Integer articleId, Integer userId, Integer articleStatus) {
+        ArticleDTO articleDTO = this.getArticle(articleId);
+        if (articleDTO == null){
+            throw new MyRuntimeException("当前文章不存在");
+        }
+        //验证文章归属的用户
+        if (!articleDTO.getUserDTO().getUserId().equals(userId)){
+            throw new MyRuntimeException("当前文章不属于你的，不允许编辑");
+        }
+        saveArticleStatus(articleId,articleStatus);
+    }
+
+    @Override
+    public void saveArticleStatus(Integer articleId, Integer articleStatus) {
         Article article = new Article();
         article.setArticleId(articleId);
         article.setArticleStatus(articleStatus);
@@ -167,6 +182,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         articleMapper.updateArticleView(articleId);
+    }
+
+    @Override
+    public void topArticle(Integer articleId, Integer articleTop) {
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article.setArticleTop(articleTop);
+        articleMapper.updateById(article);
     }
 
     //处理标签和话题

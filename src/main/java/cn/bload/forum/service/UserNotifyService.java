@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import cn.bload.forum.entity.dto.UserDTO;
 import cn.bload.forum.entity.dto.UserNotifyDTO;
 import cn.bload.forum.entity.query.NotifyQuery;
@@ -61,9 +59,8 @@ public interface UserNotifyService extends IService<UserNotify> {
 
     /**
      * 推送用户登录通知
-     * @param request 用于获取ip
      * @param userDTO 用户数据
      */
-    void pushUserLoginNotify(HttpServletRequest request, UserDTO userDTO);
+    void pushUserLoginNotify(UserDTO userDTO);
 
 }

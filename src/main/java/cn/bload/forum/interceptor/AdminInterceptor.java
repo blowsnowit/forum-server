@@ -4,17 +4,15 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
-
-import java.lang.reflect.Method;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cn.bload.forum.annotation.NeedLogin;
+import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.exception.UnLoginException;
 import cn.bload.forum.service.RedisService;
+import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.TokenUtil;
 
 /**
@@ -25,33 +23,27 @@ import cn.bload.forum.utils.TokenUtil;
  */
 
 @Component
-public class TokenInterceptor extends HandlerInterceptorAdapter {
+public class AdminInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     RedisService redisService;
+    @Autowired
+    UserService userService;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (request.getMethod().equals("OPTIONS")) {
             return true;
         }
-        if (handler instanceof HandlerMethod){
-            HandlerMethod handlerMethod = (HandlerMethod) handler;
-            Method method = handlerMethod.getMethod();
-            NeedLogin annotation = method.getAnnotation(NeedLogin.class);
-            if (annotation != null){
-                //检查是否登录了
-                if (!checkIsLogin(request)){
-                    throw new UnLoginException();
-                }
-            }
-
-            //更新用户在线状态
-            if (checkIsLogin(request)){
-                Integer userId = getUserId(request);
-                redisService.cacheUserOnline(userId);
-            }
+        //判断是不是管理员访问
+        //不是管理员访问直接拦截他
+        Integer userId = getUserId(request);
+        if (userId == null){
+            throw new UnLoginException("未登录");
         }
-
+        if (!userService.isOp(userId)){
+            throw new MyRuntimeException("非管理员访问");
+        }
 
         return true;
     }

@@ -28,6 +28,13 @@ public interface ArticleService extends IService<Article> {
     List<ArticleDTO> getArticles(ArticleQuery articleQuery);
 
     /**
+     * 管理员获取全部文章
+     * @param articleQuery
+     * @return
+     */
+    List<ArticleDTO> getOpArticles(ArticleQuery articleQuery);
+
+    /**
      * 获取指定的文章
      * @param articleId 文章id
      * @return 文章对象
@@ -37,18 +44,34 @@ public interface ArticleService extends IService<Article> {
 
     void addArticle(Article article);
 
-    void saveArticle(Article article);
-
     Integer addArticle(ArticleVO articleVO, Integer userId);
 
-    void saveArticle(Integer articleId, Integer userId, ArticleVO articleVO);
+    void saveArticle(Integer articleId,ArticleVO articleVO);
 
-    void saveArticleStatus(Integer articleId, Integer userId, Integer articleStatus);
+    void saveArticleBeforeCheck(Integer articleId, Integer userId, ArticleVO articleVO);
+
+    void saveArticleStatusBeforeCheck(Integer articleId, Integer userId, Integer articleStatus);
+
+
+    /**
+     * 修改用户状态
+     * @param articleId 文章id
+     * @param articleStatus 文章状态
+     */
+    void saveArticleStatus(Integer articleId, Integer articleStatus);
 
     /**
      * 添加文章阅览记录
      * @param articleId 文章id
      */
     void addArticleView(Integer articleId);
+
+
+    /**
+     * 置顶文章
+     * @param articleId 文章id
+     * @param articleTop 置顶序号 0 取消置顶
+     */
+    void topArticle(Integer articleId, Integer articleTop);
 
 }

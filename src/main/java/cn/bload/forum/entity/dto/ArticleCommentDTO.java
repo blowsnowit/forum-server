@@ -30,6 +30,9 @@ public class ArticleCommentDTO {
     @ApiModelProperty(value = "评论时间")
     private Date articleCommentTime;
 
+    @ApiModelProperty(value = "文章")
+    private ArticleDTO articleDTO;
+
     @ApiModelProperty(value = "评论用户")
     private ArticleUserDTO userDTO;
 

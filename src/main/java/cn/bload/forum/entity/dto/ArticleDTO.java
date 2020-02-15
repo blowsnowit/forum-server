@@ -41,6 +41,9 @@ public class ArticleDTO {
     @ApiModelProperty(value = "文章评论数量")
     private Integer articleCommentCount;
 
+    @ApiModelProperty(value = "置顶序号 0取消置顶 倒序")
+    private Integer articleTop;
+
     @ApiModelProperty(value = "文章作者")
     private ArticleUserDTO userDTO;
 

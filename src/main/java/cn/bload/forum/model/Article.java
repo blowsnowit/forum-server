@@ -54,4 +54,7 @@ public class Article implements Serializable {
 
     @ApiModelProperty(value = "文章阅览次数")
     private Integer articleView;
+
+    @ApiModelProperty(value = "置顶序号 0取消置顶 倒序")
+    private Integer articleTop;
 }

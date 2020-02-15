@@ -38,4 +38,8 @@ public class UserDTO {
 
     @ApiModelProperty(value = "用户注册时间")
     private Date userAddTime;
+
+    @ApiModelProperty(value = "是否是管理员 1是 0不是")
+    private Integer userOp;
+
 }

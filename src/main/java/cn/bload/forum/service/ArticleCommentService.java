@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 import cn.bload.forum.entity.dto.ArticleCommentDTO;
+import cn.bload.forum.entity.query.CommentQuery;
 import cn.bload.forum.entity.vo.ArticleCommentAddVO;
 import cn.bload.forum.model.ArticleComment;
 
@@ -48,5 +49,7 @@ public interface ArticleCommentService extends IService<ArticleComment> {
      * @param articleCommentId 评论id
      */
     void delArticleCommentBeforeCheck(Integer userId, Integer articleCommentId);
+
+    List<ArticleCommentDTO> getComments(CommentQuery commentQuery);
 
 }

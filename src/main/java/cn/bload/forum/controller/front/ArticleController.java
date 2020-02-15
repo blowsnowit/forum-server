@@ -41,7 +41,7 @@ public class ArticleController extends BaseController {
     public ResultBean getArticles(ArticleQuery articleQuery){
         articleQuery.setNowUserId(getUserIdNoCheck());
 
-        articleQuery.setPageOrders("a.article_id desc");
+        articleQuery.setPageOrders("a.article_top desc,a.article_id desc");
         Page page = articleQuery.createPage();
         page.setRecords(articleService.getArticles(articleQuery));
         return ResultGenerator.getSuccessResult(page);
@@ -82,7 +82,7 @@ public class ArticleController extends BaseController {
     @ApiOperation(value = "/{articleId}",notes = "编辑文章")
     public ResultBean saveArticle(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                   @RequestBody ArticleVO articleVO){
-        articleService.saveArticle(articleId,getUserId(),articleVO);
+        articleService.saveArticleBeforeCheck(articleId,getUserId(),articleVO);
         return ResultGenerator.getSuccessResult("编辑成功");
     }
 
@@ -90,7 +90,7 @@ public class ArticleController extends BaseController {
     @ApiOperation(value = "/{articleId}/{articleStatus}",notes = "修改文章状态")
     public ResultBean saveArticleStatus(@ApiParam(value = "文章id") @PathVariable Integer articleId,
                                         @ApiParam(value = "文章状态") @PathVariable Integer articleStatus){
-        articleService.saveArticleStatus(articleId,getUserId(),articleStatus);
+        articleService.saveArticleStatusBeforeCheck(articleId,getUserId(),articleStatus);
         return ResultGenerator.getSuccessResult("删除成功");
     }
 
