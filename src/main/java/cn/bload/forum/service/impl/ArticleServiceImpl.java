@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -150,6 +151,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    public void saveArticleStatus(Integer articleId, Integer articleStatus) {
+        Article article = new Article();
+        article.setArticleId(articleId);
+        article.setArticleStatus(articleStatus);
+        articleMapper.updateById(article);
+    }
+
+    @Override
     public void saveArticleStatusBeforeCheck(Integer articleId, Integer userId, Integer articleStatus) {
         ArticleDTO articleDTO = this.getArticle(articleId);
         if (articleDTO == null){
@@ -162,13 +171,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         saveArticleStatus(articleId,articleStatus);
     }
 
-    @Override
-    public void saveArticleStatus(Integer articleId, Integer articleStatus) {
-        Article article = new Article();
-        article.setArticleId(articleId);
-        article.setArticleStatus(articleStatus);
-        articleMapper.updateById(article);
-    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)

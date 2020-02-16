@@ -1,5 +1,6 @@
 package cn.bload.forum.entity.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import lombok.Data;
  * @describe 类描述:
  */
 @Data
-public class ArticleCommentDTO {
+public class ArticleCommentDTO implements Serializable {
 
     @ApiModelProperty(value = "文章评论id")
     private Integer articleCommentId;

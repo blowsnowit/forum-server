@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bload.forum.dao.UserNotifyConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.bload.forum.model.UserNotifyConfig">
+        <id column="user_notify_config_id" property="userNotifyConfigId" />
+        <result column="user_id" property="userId" />
+        <result column="user_notify_config_name" property="userNotifyConfigName" />
+        <result column="user_notify_config_notify" property="userNotifyConfigNotify" />
+        <result column="user_notify_config_email" property="userNotifyConfigEmail" />
+    </resultMap>
+
+    <select id="getNotifyConfig" resultType="cn.bload.forum.model.UserNotifyConfig">
+        SELECT
+            unc.*
+        FROM
+            (	SELECT
+                *
+                FROM
+                forum_user_notify_config
+                where
+                (user_id = #{userId} or user_id = 0)
+                and
+                user_notify_config_value = #{value}
+                order by user_notify_config_id desc
+            ) unc
+        GROUP BY unc.user_notify_config_name
+    </select>
+
+    <select id="getNotifyConfigs" resultType="cn.bload.forum.model.UserNotifyConfig">
+        SELECT
+            unc.*
+        FROM
+            (	SELECT
+                *
+                FROM
+                forum_user_notify_config
+                where
+                (user_id = #{userId} or user_id = 0)
+                order by user_notify_config_id desc
+            ) unc
+        GROUP BY unc.user_notify_config_name
+    </select>
+
+
+</mapper>

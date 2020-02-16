@@ -1,5 +1,6 @@
 package cn.bload.forum.entity.dto;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import lombok.Data;
  */
 @Data
 @ApiModel(value = "文章对象")
-public class ArticleDTO {
+public class ArticleDTO implements Serializable {
 
     @ApiModelProperty(value = "文章id")
     private Integer articleId;
