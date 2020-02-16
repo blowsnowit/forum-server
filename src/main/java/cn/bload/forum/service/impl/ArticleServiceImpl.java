@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,6 +107,70 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
 
+    /**
+     * 处理标签和话题
+     * @param articleId
+     * @param articleVO
+     */
+    private void doArticleTopicAndTag(Integer articleId,ArticleVO articleVO){
+        //删除原来的标签和话题
+        QueryWrapper<ArticleTopic> articleTopicQueryWrapper = new QueryWrapper<>();
+        articleTopicQueryWrapper.lambda().eq(ArticleTopic::getArticleId,articleId);
+        articleTopicMapper.delete(articleTopicQueryWrapper);
+
+        QueryWrapper<ArticleTag> articleTagQueryWrapper = new QueryWrapper<>();
+        articleTagQueryWrapper.lambda().eq(ArticleTag::getArticleId,articleId);
+        articleTagMapper.delete(articleTagQueryWrapper);
+
+
+        List<String> articleTopics = articleVO.getArticleTopics();
+        if (articleTopics != null){
+            for (String topicName : articleTopics) {
+                //获取这个话题的id
+                QueryWrapper<Topic> topicQueryWrapper = new QueryWrapper();
+                topicQueryWrapper.lambda().eq(Topic::getTopicName,topicName);
+                Topic topic = topicMapper.selectOne(topicQueryWrapper);
+                if (topic == null){
+                    topic = new Topic();
+                    topic.setTopicName(topicName);
+                    topic.setTopicAddTime(new Date());
+                    topicMapper.insert(topic);
+                }
+                ArticleTopic articleTopic = new ArticleTopic();
+                articleTopic.setArticleId(articleId);
+                articleTopic.setTopicId(topic.getTopicId());
+                articleTopic.setAddTime(new Date());
+                int result = articleTopicMapper.insert(articleTopic);
+                if (result != 1){
+                    throw new MyRuntimeException("插入话题失败");
+                }
+            }
+        }
+
+
+        List<String> articleTags = articleVO.getArticleTags();
+        if (articleTags != null){
+            for (String tagName : articleTags) {
+                //获取这个话题的id
+                QueryWrapper<Tag> tagQueryWrapper = new QueryWrapper();
+                tagQueryWrapper.lambda().eq(Tag::getTagName,tagName);
+                Tag tag = tagMapper.selectOne(tagQueryWrapper);
+                if (tag == null){
+                    tag = new Tag();
+                    tag.setTagName(tagName);
+                    tag.setTagAddTime(new Date());
+                    tagMapper.insert(tag);
+                }
+                ArticleTag articleTag = new ArticleTag();
+                articleTag.setArticleId(articleId);
+                articleTag.setTagId(tag.getTagId());
+                int result = articleTagMapper.insert(articleTag);
+                if (result != 1){
+                    throw new MyRuntimeException("插入标签失败");
+                }
+            }
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -195,64 +258,4 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleMapper.updateById(article);
     }
 
-    //处理标签和话题
-    void doArticleTopicAndTag(Integer articleId,ArticleVO articleVO){
-        //删除原来的标签和话题
-        QueryWrapper<ArticleTopic> articleTopicQueryWrapper = new QueryWrapper<>();
-        articleTopicQueryWrapper.lambda().eq(ArticleTopic::getArticleId,articleId);
-        articleTopicMapper.delete(articleTopicQueryWrapper);
-
-        QueryWrapper<ArticleTag> articleTagQueryWrapper = new QueryWrapper<>();
-        articleTagQueryWrapper.lambda().eq(ArticleTag::getArticleId,articleId);
-        articleTagMapper.delete(articleTagQueryWrapper);
-
-
-        List<String> articleTopics = articleVO.getArticleTopics();
-        if (articleTopics != null){
-            for (String topicName : articleTopics) {
-                //获取这个话题的id
-                QueryWrapper<Topic> topicQueryWrapper = new QueryWrapper();
-                topicQueryWrapper.lambda().eq(Topic::getTopicName,topicName);
-                Topic topic = topicMapper.selectOne(topicQueryWrapper);
-                if (topic == null){
-                    topic = new Topic();
-                    topic.setTopicName(topicName);
-                    topic.setTopicAddTime(new Date());
-                    topicMapper.insert(topic);
-                }
-                ArticleTopic articleTopic = new ArticleTopic();
-                articleTopic.setArticleId(articleId);
-                articleTopic.setTopicId(topic.getTopicId());
-                articleTopic.setAddTime(new Date());
-                int result = articleTopicMapper.insert(articleTopic);
-                if (result != 1){
-                    throw new MyRuntimeException("插入话题失败");
-                }
-            }
-        }
-
-
-        List<String> articleTags = articleVO.getArticleTags();
-        if (articleTags != null){
-            for (String tagName : articleTags) {
-                //获取这个话题的id
-                QueryWrapper<Tag> tagQueryWrapper = new QueryWrapper();
-                tagQueryWrapper.lambda().eq(Tag::getTagName,tagName);
-                Tag tag = tagMapper.selectOne(tagQueryWrapper);
-                if (tag == null){
-                    tag = new Tag();
-                    tag.setTagName(tagName);
-                    tag.setTagAddTime(new Date());
-                    tagMapper.insert(tag);
-                }
-                ArticleTag articleTag = new ArticleTag();
-                articleTag.setArticleId(articleId);
-                articleTag.setTagId(tag.getTagId());
-                int result = articleTagMapper.insert(articleTag);
-                if (result != 1){
-                    throw new MyRuntimeException("插入标签失败");
-                }
-            }
-        }
-    }
 }
