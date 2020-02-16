@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,6 +100,9 @@ public class MailServiceImpl implements MailService {
         }
         if (mailTemplate == null){
             return null;
+        }
+        if (params == null){
+            params = new HashMap<>();
         }
         //内置变量
         params.put("email",to);

@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.dao.UserMapper;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.dto.UserDTO;
@@ -82,8 +83,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new MyRuntimeException("账号已被禁用");
         }
         UserDTO userDTO = user.toUserDTO();
-
-        userNotifyService.pushUserLoginNotify(userDTO);
         return userDTO;
     }
 
@@ -113,8 +112,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new MyRuntimeException("注册失败");
         }
 
-        //TODO 队列发送注册成功邮件
-        mailService.send(userRegisterVO.getEmail(),"用户注册测试","测试内容",false);
+        //队列发送注册成功邮件
+        mailService.sendTemplate(userRegisterVO.getEmail(), MailTemplate.REGISTER_SUCCESS,null);
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import cn.bload.forum.constenum.MailTemplate;
 import cn.bload.forum.constenum.NotifyTargetType;
 import cn.bload.forum.dao.ArticleCommentMapper;
 import cn.bload.forum.dao.ArticleMapper;
@@ -24,8 +25,13 @@ import cn.bload.forum.entity.dto.UserNotifyDTO;
 import cn.bload.forum.entity.query.NotifyQuery;
 import cn.bload.forum.model.Article;
 import cn.bload.forum.model.ArticleComment;
+import cn.bload.forum.model.User;
 import cn.bload.forum.model.UserNotify;
+import cn.bload.forum.model.UserNotifyConfig;
+import cn.bload.forum.service.MailService;
+import cn.bload.forum.service.UserNotifyConfigService;
 import cn.bload.forum.service.UserNotifyService;
+import cn.bload.forum.service.UserService;
 import cn.bload.forum.utils.IpUtil;
 import cn.hutool.core.date.DateUtil;
 
@@ -48,7 +54,13 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
     @Resource
     ArticleCommentMapper articleCommentMapper;
     @Autowired
-    protected HttpServletRequest request;
+    HttpServletRequest request;
+    @Autowired
+    UserNotifyConfigService userNotifyConfigService;
+    @Autowired
+    MailService mailService;
+    @Autowired
+    UserService userService;
 
     @Override
     public List<UserNotifyDTO> getNotifys(NotifyQuery notifyQuery) {
@@ -143,7 +155,6 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
 
     @Override
     public void pushUserLoginNotify(UserDTO userDTO) {
-
         String ipAddr = IpUtil.getIpAddr(request);
         String time = DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss");
         String content = "于 " + time + " 在[" + ipAddr + "] 登录";
@@ -151,26 +162,41 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
     }
 
 
-    /**
-     * 推送给用户通知
-     * @param targetType 目标类型(article/comment/notice)
-     * @param target 目标id(文章id/评论id)
-     * @param userId 用户id
-     * @param content 通知内容
-     */
-    private void pushNotify(NotifyTargetType targetType,Integer target,Integer userId,String content){
+    @Override
+    public void pushNotify(NotifyTargetType targetType, Integer target, Integer userId, String content){
+        pushNotify(targetType,target,userId,content,null);
+    }
+
+    @Override
+    public void pushNotify(NotifyTargetType targetType, Integer target, Integer userId, String content, MailTemplate mailTemplate) {
         //需要判断用户是否设置不接收
+        UserNotifyConfig userNotifyConfig = userNotifyConfigService.getNotifyConfig(userId,targetType.getName());
 
+        //判断是否网站通知
+        if (userNotifyConfig.getUserNotifyConfigNotify() == 1){
+            UserNotify userNotify = new UserNotify();
+            userNotify.setTargetType(targetType.getName());
+            userNotify.setTarget(target);
+            userNotify.setCreateTime(new Date());
+            userNotify.setUserId(userId);
+            userNotify.setContent(content);
+            userNotifyMapper.insert(userNotify);
 
-        UserNotify userNotify = new UserNotify();
-        userNotify.setTargetType(targetType.getName());
-        userNotify.setTarget(target);
-        userNotify.setCreateTime(new Date());
-        userNotify.setUserId(userId);
-        userNotify.setContent(content);
-        userNotifyMapper.insert(userNotify);
-
-        //websocket推送给用户
+            //websocket推送给用户
+        }
+        //判断是否邮件通知
+        if (userNotifyConfig.getUserNotifyConfigEmail() == 1){
+            //获取用户邮箱
+            User user = userService.getById(userId);
+            String userEmail = user.getUserEmail();
+            if(mailTemplate == null){
+                mailService.send(userEmail,"站内提醒",content,true);
+            }else{
+                mailService.sendTemplate(userEmail,mailTemplate,null);
+            }
+        }
 
     }
+
+
 }

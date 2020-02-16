@@ -13,8 +13,8 @@ public enum  MailTemplate {
     /**
      * 注册模板
      */
-    REGISTER("邮箱地址验证","mail_template_register"),
-
+    REGISTER("邮箱注册验证","mail_template_register"),
+    REGISTER_SUCCESS("注册成功","mail_template_register"),
     /**
      * 注册模板
      */

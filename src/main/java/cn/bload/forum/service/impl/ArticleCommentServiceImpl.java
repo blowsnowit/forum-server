@@ -19,6 +19,7 @@ import cn.bload.forum.exception.MyRuntimeException;
 import cn.bload.forum.model.Article;
 import cn.bload.forum.model.ArticleComment;
 import cn.bload.forum.service.ArticleCommentService;
+import cn.bload.forum.service.UserNotifyService;
 
 /**
  * <p>
@@ -34,6 +35,8 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
     ArticleCommentMapper articleCommentMapper;
     @Resource
     ArticleMapper articleMapper;
+    @Resource
+    UserNotifyService userNotifyService;
 
     /**
      * 无限级枚举子评论

@@ -42,8 +42,6 @@ public class ArticleCommentController extends BaseController {
 
         Integer commendId = articleCommentService.addArticleCommentBeforeCheck(getUserId(), articleId, articleCommentAddVO);
 
-        //推送评论给文章作者
-        userNotifyService.pushCommentNotify(commendId);
         return ResultGenerator.getSuccessResult("评论成功");
     }
 
