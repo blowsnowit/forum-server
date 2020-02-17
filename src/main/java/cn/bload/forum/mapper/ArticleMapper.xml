@@ -48,7 +48,7 @@
         u.user_desc user_user_desc,
         u.user_add_time user_user_add_time,
         u.user_face user_user_face,
-        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id) article_comment_count
+        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id and ac.article_comment_status = 1) article_comment_count
         from forum_article a
         left join forum_user u on u.user_id = a.user_id
         left join forum_article_tag atg on atg.article_id = a.article_id
@@ -94,7 +94,7 @@
         u.user_desc user_user_desc,
         u.user_add_time user_user_add_time,
         u.user_face user_user_face,
-        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id) article_comment_count
+        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id and ac.article_comment_status = 1) article_comment_count
         from forum_article a
         left join forum_user u on u.user_id = a.user_id
         left join forum_article_tag atg on atg.article_id = a.article_id

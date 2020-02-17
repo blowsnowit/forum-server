@@ -51,6 +51,9 @@ public class ArticleComment implements Serializable {
     @ApiModelProperty(value = "评论时间")
     private Date articleCommentTime;
 
+    @ApiModelProperty(value = "评论状态 1正常 0删除")
+    private Integer articleCommentStatus;
+
     public ArticleCommentDTO toArticleCommentDTO(){
         ArticleCommentDTO articleCommentDTO = new ArticleCommentDTO();
         BeanUtils.copyProperties(this,articleCommentDTO);

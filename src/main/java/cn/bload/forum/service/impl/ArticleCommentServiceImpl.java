@@ -116,6 +116,14 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
     }
 
     @Override
+    public void delArticleComment(Integer articleCommentId) {
+        ArticleComment newArticleComment = new ArticleComment();
+        newArticleComment.setArticleCommentId(articleCommentId);
+        newArticleComment.setArticleCommentStatus(0);
+        articleCommentMapper.updateById(newArticleComment);
+    }
+
+    @Override
     public void delArticleCommentBeforeCheck(Integer userId, Integer articleCommentId) {
         ArticleComment articleComment = articleCommentMapper.selectById(articleCommentId);
         if (articleComment == null){
@@ -124,11 +132,19 @@ public class ArticleCommentServiceImpl extends ServiceImpl<ArticleCommentMapper,
         if (!articleComment.getUserId().equals(userId)){
             throw new MyRuntimeException("不能修改此评论");
         }
-        articleCommentMapper.deleteById(articleCommentId);
+        delArticleComment(articleCommentId);
     }
 
     @Override
     public List<ArticleCommentDTO> getComments(CommentQuery commentQuery) {
         return articleCommentMapper.getArticleCommentsOp(commentQuery);
+    }
+
+    @Override
+    public void saveArticleCommentStatus(Integer articleCommentId, Integer articleCommentStatus) {
+        ArticleComment articleComment = new ArticleComment();
+        articleComment.setArticleCommentId(articleCommentId);
+        articleComment.setArticleCommentStatus(articleCommentStatus);
+        articleCommentMapper.updateById(articleComment);
     }
 }

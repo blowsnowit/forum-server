@@ -43,6 +43,7 @@ public interface ArticleCommentService extends IService<ArticleComment> {
      */
     void editArticleCommentBeforeCheck(Integer userId, Integer articleCommentId, String articleComment);
 
+    void delArticleComment(Integer articleCommentId);
     /**
      * 删除评论并且检查
      * @param userId 用户id
@@ -52,4 +53,10 @@ public interface ArticleCommentService extends IService<ArticleComment> {
 
     List<ArticleCommentDTO> getComments(CommentQuery commentQuery);
 
+    /**
+     * 修改文章评论状态
+     * @param articleCommentId 评论id
+     * @param articleCommentStatus 评论状态
+     */
+    void saveArticleCommentStatus(Integer articleCommentId, Integer articleCommentStatus);
 }

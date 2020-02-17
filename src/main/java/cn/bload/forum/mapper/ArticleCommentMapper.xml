@@ -10,6 +10,7 @@
         <result column="user_id" property="userId" />
         <result column="article_comment" property="articleComment" />
         <result column="article_comment_time" property="articleCommentTime" />
+        <result column="article_comment_status" property="articleCommentStatus" />
     </resultMap>
 
     <resultMap id="ArticleCommentDTOResultMap" type="cn.bload.forum.entity.dto.ArticleCommentDTO">
@@ -18,6 +19,7 @@
         <result column="article_id" property="articleId" />
         <result column="article_comment" property="articleComment" />
         <result column="article_comment_time" property="articleCommentTime" />
+        <result column="article_comment_status" property="articleCommentStatus" />
 
         <association columnPrefix="user_" property="userDTO" resultMap="cn.bload.forum.dao.UserMapper.ArticleUserDTOMap">
         </association>
@@ -41,6 +43,7 @@
         from forum_article_comment ac
         left join forum_user u on u.user_id = ac.user_id
         where article_id = #{articleId}
+        and article_comment_status = 1
     </select>
 
     <select id="getArticleComment" resultMap="ArticleCommentDTOResultMap">

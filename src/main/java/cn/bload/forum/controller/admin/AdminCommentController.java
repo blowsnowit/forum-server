@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,11 +41,18 @@ public class AdminCommentController extends BaseController {
     }
 
 
+    @PutMapping("/{articleCommentId}/{articleCommentStatus}")
+    @ApiOperation(value = "/{articleCommentId}/{articleCommentStatus}",notes = "修改文章评论状态")
+    public ResultBean saveArticleCommentStatus(@ApiParam(value = "文章评论id") @PathVariable Integer articleCommentId,
+                                        @ApiParam(value = "文章评论状态") @PathVariable Integer articleCommentStatus){
+        articleCommentService.saveArticleCommentStatus(articleCommentId,articleCommentStatus);
+        return ResultGenerator.getSuccessResult();
+    }
 
     @DeleteMapping("/{articleCommentId}")
     @ApiOperation(value = "/{articleCommentId}",notes = "删除评论")
     public ResultBean delComment(@ApiParam("文章评论id") @PathVariable Integer articleCommentId){
-        articleCommentService.removeById(articleCommentId);
+        articleCommentService.delArticleComment(articleCommentId);
         return ResultGenerator.getSuccessResult();
     }
 

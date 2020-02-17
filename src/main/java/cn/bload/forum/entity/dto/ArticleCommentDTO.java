@@ -31,6 +31,9 @@ public class ArticleCommentDTO implements Serializable {
     @ApiModelProperty(value = "评论时间")
     private Date articleCommentTime;
 
+    @ApiModelProperty(value = "评论状态 1正常 0删除")
+    private Integer articleCommentStatus;
+
     @ApiModelProperty(value = "文章")
     private ArticleDTO articleDTO;
 
