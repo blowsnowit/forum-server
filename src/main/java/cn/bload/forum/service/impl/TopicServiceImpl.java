@@ -55,4 +55,13 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
     public List<TopicDTO> getHotTopics(TopicQuery topicQuery) {
         return topicMapper.getHotTopics(topicQuery);
     }
+
+    @Override
+    public void saveTopicDesc(String topicName, String topicDesc) {
+        Topic topic = new Topic();
+        topic.setTopicDesc(topicDesc);
+        QueryWrapper<Topic> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Topic::getTopicName,topicName);
+        topicMapper.update(topic,queryWrapper);
+    }
 }

@@ -18,8 +18,25 @@ import cn.bload.forum.model.Topic;
  */
 public interface TopicService extends IService<Topic> {
 
+    /**
+     * 获取话题信息
+     * @param topicName 话题名称
+     * @return
+     */
     TopicDTO getTopicInfo(String topicName);
 
+    /**
+     * 获取热门话题
+     * @param topicQuery
+     * @return
+     */
     List<TopicDTO> getHotTopics(TopicQuery topicQuery);
+
+    /**
+     * 修改话题描述
+     * @param topicName 话题名称
+     * @param topicDesc 话题描述
+     */
+    void saveTopicDesc(String topicName, String topicDesc);
 
 }
