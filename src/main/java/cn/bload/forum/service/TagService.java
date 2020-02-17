@@ -20,4 +20,6 @@ public interface TagService extends IService<Tag> {
 
     List<TagDTO> getHotTags(TagQuery tagQuery);
 
+    TagDTO getTagInfo(String tagName);
+
 }
