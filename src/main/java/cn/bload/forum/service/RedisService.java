@@ -36,6 +36,11 @@ public interface RedisService {
      */
     Object getCaptch(String token);
 
+    /**
+     * 删除图形验证码
+     * @param token
+     */
+    void delCaptch(String token);
 
     /**
      * 缓存的用户在线状态
@@ -54,5 +59,6 @@ public interface RedisService {
      * @return
      */
     Boolean getUserOnline(Integer userId);
+
 
 }

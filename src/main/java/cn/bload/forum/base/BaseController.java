@@ -119,7 +119,7 @@ public class BaseController {
      * @param token 图形验证码token
      * @param code 验证码
      */
-    protected void checkCaptch(String token,String code){
+    protected boolean checkCaptch(String token,String code){
         Object cacheCode = redisService.getCaptch(token);
         if (cacheCode == null){
             throw new MyRuntimeException("请重新获取图形验证码");
@@ -127,6 +127,10 @@ public class BaseController {
         if (!code.equals(cacheCode.toString())){
             throw new MyRuntimeException("图形验证码错误");
         }
+        //防止用户使用token重复调用
+        //清除token
+        redisService.delCaptch(token);
+        return true;
     }
 
 
@@ -134,11 +138,10 @@ public class BaseController {
     /**
      * 验证邮箱验证码
      * TODO 限制检查次数和时间
-     * TODO 考虑是否只能使用一次验证码
      * @param email 邮箱
      * @param code 验证码
      */
-    protected void checkEmailCode(String email,String code){
+    protected boolean checkEmailCode(String email,String code){
         Object cahceCode = redisService.getEmailCode(email);
         if (cahceCode == null){
             throw new MyRuntimeException("请重新获取邮箱验证码");
@@ -146,5 +149,6 @@ public class BaseController {
         if (!code.equals(cahceCode.toString())){
             throw new MyRuntimeException("邮箱验证码错误");
         }
+        return true;
     }
 }

@@ -150,7 +150,9 @@ public class UserNotifyServiceImpl extends ServiceImpl<UserNotifyMapper, UserNot
         }
 
 
-        pushNotify(NotifyTargetType.COMMENT,commentId,userId,"");
+        String content = "有人回复了你：" + articleComment.getArticleComment();
+
+        pushNotify(NotifyTargetType.COMMENT,commentId,userId,content);
     }
 
     @Override

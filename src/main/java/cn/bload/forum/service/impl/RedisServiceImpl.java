@@ -46,6 +46,11 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public void delCaptch(String token) {
+        redisOperator.remove(Const.REDIS_CAPTCH + token);
+    }
+
+    @Override
     public void cacheUserOnline(Integer userId) {
         redisOperator.set(Const.REDIS_USER_ONLINE + userId,1,Const.REDIS_USER_ONLINE_EXPIRE);
     }
