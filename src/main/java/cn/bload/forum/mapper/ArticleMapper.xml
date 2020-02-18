@@ -38,9 +38,7 @@
         where article_id = #{articleId}
     </update>
 
-
-    <select id="getArticles" resultMap="ArticleDTOResultMap">
-        select
+    <sql id="ArticleDTOResultMapSelect">
         a.*,
         u.user_id user_user_id,
         u.user_name user_user_name,
@@ -55,6 +53,22 @@
         left join forum_tag tg on tg.tag_id = atg.tag_id
         left join forum_article_topic atp on atp.article_id = a.article_id
         left join forum_topic tp on tp.topic_id = atp.topic_id
+    </sql>
+    <select id="getArticlesByIds" resultMap="ArticleDTOResultMap">
+        select
+        <include refid="ArticleDTOResultMapSelect" />
+
+        where
+          a.article_id in
+          <foreach collection="articleIds" item="id" open="(" close=")" separator=",">
+              #{id}
+          </foreach>
+        GROUP BY a.article_id
+    </select>
+
+    <select id="getArticles" resultMap="ArticleDTOResultMap">
+        select
+        <include refid="ArticleDTOResultMapSelect" />
 
         <where>
             1 = 1
@@ -87,24 +101,12 @@
 
     <select id="getArticle" resultMap="ArticleDTOResultMap">
         select
-        a.*,
-        u.user_id user_user_id,
-        u.user_name user_user_name,
-        u.user_nick user_user_nick,
-        u.user_desc user_user_desc,
-        u.user_add_time user_user_add_time,
-        u.user_face user_user_face,
-        (select count(*) commentCount from forum_article_comment ac where a.article_id = ac.article_id and ac.article_comment_status = 1) article_comment_count
-        from forum_article a
-        left join forum_user u on u.user_id = a.user_id
-        left join forum_article_tag atg on atg.article_id = a.article_id
-        left join forum_tag tg on tg.tag_id = atg.tag_id
-        left join forum_article_topic atp on atp.article_id = a.article_id
-        left join forum_topic tp on tp.topic_id = atp.topic_id
+        <include refid="ArticleDTOResultMapSelect" />
         where
             a.article_id = #{articleId}
         group by a.article_id
     </select>
+
 
 
 </mapper>

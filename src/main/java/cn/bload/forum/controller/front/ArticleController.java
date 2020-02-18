@@ -58,6 +58,13 @@ public class ArticleController extends BaseController {
         return ResultGenerator.getSuccessResult(page);
     }
 
+    @GetMapping("/search")
+    @ApiOperation(value = "/search",notes = "搜索文章列表")
+    public ResultBean searchArticles(ArticleQuery articleQuery){
+        Page page = articleQuery.createPage();
+        page.setRecords(articleService.searchArticles(articleQuery));
+        return ResultGenerator.getSuccessResult(page);
+    }
 
     @GetMapping("/{articleId}")
     @ApiOperation(value = "/{articleId}",notes = "/获取指定文章")

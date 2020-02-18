@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -20,6 +24,7 @@ import cn.bload.forum.dao.TagMapper;
 import cn.bload.forum.dao.TopicMapper;
 import cn.bload.forum.entity.dto.ArticleCommentDTO;
 import cn.bload.forum.entity.dto.ArticleDTO;
+import cn.bload.forum.entity.dto.ArticleSearchDTO;
 import cn.bload.forum.entity.dto.ArticleUserDTO;
 import cn.bload.forum.entity.query.ArticleQuery;
 import cn.bload.forum.entity.vo.ArticleVO;
@@ -31,6 +36,7 @@ import cn.bload.forum.model.ArticleView;
 import cn.bload.forum.model.Tag;
 import cn.bload.forum.model.Topic;
 import cn.bload.forum.service.ArticleCommentService;
+import cn.bload.forum.service.ArticleSearchService;
 import cn.bload.forum.service.ArticleService;
 import cn.bload.forum.service.RedisService;
 
@@ -60,6 +66,40 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     ArticleCommentService articleCommentService;
     @Resource
     RedisService redisService;
+    @Autowired
+    ArticleSearchService articleSearchService;
+
+
+    @Override
+    public List<ArticleDTO> searchArticles(ArticleQuery articleQuery) {
+        Page<ArticleSearchDTO> articleSearchDTOPage = articleSearchService.searchArticles(articleQuery);
+        List<ArticleSearchDTO> articleSearchDTOS = articleSearchDTOPage.get().collect(Collectors.toList());
+
+        List<Integer> articleIds = new ArrayList<>();
+
+        for (ArticleSearchDTO articleSearchDTO : articleSearchDTOS) {
+            articleIds.add(articleSearchDTO.getArticleId());
+        }
+
+        //分页数据填充
+        articleQuery.getPage().setTotal(articleSearchDTOPage.getTotalElements());
+
+        return getArticles(articleIds);
+    }
+
+    @Override
+    public List<ArticleDTO> getArticles(List<Integer> articleIds) {
+        if (articleIds.size() == 0){
+            return new ArrayList<>();
+        }
+        List<ArticleDTO> articles = articleMapper.getArticlesByIds(articleIds);
+        //设置用户在线状态
+        for (ArticleDTO article : articles) {
+            ArticleUserDTO userDTO = article.getUserDTO();
+            userDTO.setIsOnline(redisService.getUserOnline(userDTO.getUserId()));
+        }
+        return articles;
+    }
 
     @Override
     public List<ArticleDTO> getArticles(ArticleQuery articleQuery) {
@@ -100,10 +140,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     public void addArticle(Article article) {
+        article.setArticleAddTime(new Date());
+        article.setArticleUpdateTime(new Date());
         int result = articleMapper.insert(article);
         if (result == 0){
             throw new MyRuntimeException("添加失败");
         }
+
+        //添加搜索索引
+        articleSearchService.addArticleSearch(article);
     }
 
 
@@ -177,8 +222,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public Integer addArticle(ArticleVO articleVO, Integer userId) {
         Article article = articleVO.toArticle();
         article.setUserId(userId);
-        article.setArticleAddTime(new Date());
-        article.setArticleUpdateTime(new Date());
         addArticle(article);
 
         doArticleTopicAndTag(article.getArticleId(),articleVO);
@@ -197,6 +240,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         doArticleTopicAndTag(articleId,articleVO);
+
+        //添加搜索索引
+        articleSearchService.addArticleSearch(article);
     }
 
     @Override
@@ -219,6 +265,14 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setArticleId(articleId);
         article.setArticleStatus(articleStatus);
         articleMapper.updateById(article);
+
+        //添加/删除文章索引
+        //如果删除了文章
+        if (articleStatus == 0){
+            articleSearchService.delArticleSearch(articleId);
+        }else{
+            articleSearchService.addArticleSearch(articleId);
+        }
     }
 
     @Override
