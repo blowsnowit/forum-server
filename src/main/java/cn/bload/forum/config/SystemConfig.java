@@ -51,6 +51,6 @@ public class SystemConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/"+ path +"/**").addResourceLocations("file:" + uploadPath);
+        registry.addResourceHandler("/"+ path +"/**").addResourceLocations("file://" + uploadPath);
     }
 }
