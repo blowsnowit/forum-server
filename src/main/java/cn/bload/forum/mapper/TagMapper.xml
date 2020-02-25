@@ -16,6 +16,11 @@
         FROM
             forum_tag ft
             LEFT JOIN forum_article_tag fat ON fat.tag_id = ft.tag_id
+            <where>
+                <if test="searchWord != null">
+                    ft.tag_name like concat('%',#{searchWord},'%')
+                </if>
+            </where>
             GROUP BY ft.tag_id
             order by articleNum desc
     </select>

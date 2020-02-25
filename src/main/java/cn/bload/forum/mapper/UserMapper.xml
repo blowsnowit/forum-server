@@ -35,6 +35,14 @@
             <if test="userEmail != null">
                 and user_email = #{userEmail}
             </if>
+            <if test="searchWord != null">
+                and
+                (
+                    user_name like concat('%',#{searchWord},'%')
+                    or
+                    user_nick like concat('%',#{searchWord},'%')
+                )
+            </if>
         </where>
     </select>
 
