@@ -1,12 +1,15 @@
 package cn.bload.forum.utils.oss;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
 
-import cn.bload.forum.utils.YmlUtil;
+import cn.bload.forum.utils.SpringUtil;
+
 
 /**
  * @author 作者 : blownsow
@@ -25,12 +28,18 @@ public class FileOss extends AbstractOss{
     public FileOss(HttpServletRequest request) {
         String host = request.getServerName(); //获取域名
         Integer port = request.getServerPort(); //获取端口号
-        this.url = "http://" + host + ":" + port;
+        if (port == 80){
+            this.url = "http://" + host;
+        }else{
+            this.url = "http://" + host + ":" + port;
+        }
     }
 
     @Override
     public String uploadFile(String fileName, MultipartFile file) {
-        String uploadPath = YmlUtil.getYmlValue("application.yml", "web.upload-path").toString();
+        ApplicationContext applicationContext = SpringUtil.getApplicationContext();
+        Environment environment = applicationContext.getEnvironment();
+        String uploadPath = environment.getProperty("web.upload-path");
         File dest = new File(uploadPath + "/" + fileName);
         if(!dest.getParentFile().exists()){ //判断文件父目录是否存在
             dest.getParentFile().mkdir();
@@ -43,7 +52,7 @@ public class FileOss extends AbstractOss{
             return null;
         }
         //返回完整的图片地址
-        String path = YmlUtil.getYmlValue("application.yml", "web.path").toString();
+        String path = environment.getProperty("web.path");
         //拼接域名 + 端口 + path + 文件名
 
         return url + "/" + path + "/" + fileName;
