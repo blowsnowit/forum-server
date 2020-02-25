@@ -143,6 +143,24 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.atcive>dev</spring.atcive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.atcive>prod</spring.atcive>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <!-- 资源文件 -->
         <resources>
