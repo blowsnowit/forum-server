@@ -92,7 +92,9 @@
 
             -- 搜索需要优化
             <if test="searchWord != null">
-                and a.article_title like concat('%',#{searchWord},'%')
+                and (
+                a.article_title like concat('%',#{searchWord},'%')
+                )
             </if>
         </where>
 

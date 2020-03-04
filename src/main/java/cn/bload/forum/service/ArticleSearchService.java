@@ -1,7 +1,7 @@
 package cn.bload.forum.service;
 
-import org.springframework.data.domain.Page;
 
+import cn.bload.forum.base.Page;
 import cn.bload.forum.entity.dto.ArticleSearchDTO;
 import cn.bload.forum.entity.query.ArticleQuery;
 import cn.bload.forum.model.Article;

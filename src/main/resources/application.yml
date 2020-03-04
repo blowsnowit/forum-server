@@ -13,3 +13,6 @@ mybatis-plus:
   type-aliases-package: cn.bload.forum.model
   # xml
   mapper-locations: classpath:cn/bload/forum/mapper/*.xml
+
+# 是否启用 elsearch
+elsearch: true

@@ -1,5 +1,7 @@
 package cn.bload.forum.entity.dto;
 
+import org.springframework.beans.BeanUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -57,4 +59,10 @@ public class ArticleDTO implements Serializable {
 
     @ApiModelProperty(value = "文章评论列表")
     private List<ArticleCommentDTO> articleComments;
+
+    public ArticleSearchDTO toArticleSearchDTO(){
+        ArticleSearchDTO articleSearchDTO = new ArticleSearchDTO();
+        BeanUtils.copyProperties(this,articleSearchDTO);
+        return articleSearchDTO;
+    }
 }

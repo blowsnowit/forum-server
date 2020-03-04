@@ -1,8 +1,7 @@
 package cn.bload.forum.dao;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
-
-import java.util.List;
 
 import cn.bload.forum.entity.dto.ArticleSearchDTO;
 
@@ -12,6 +11,7 @@ import cn.bload.forum.entity.dto.ArticleSearchDTO;
  * @date 创建时间 : 2020/2/18 16:13
  * @describe 类描述:
  */
+@ConditionalOnProperty(value = "elsearch",havingValue = "true",matchIfMissing = true)
 public interface  ArticleSearchRepository extends ElasticsearchRepository<ArticleSearchDTO, Integer> {
 
 }

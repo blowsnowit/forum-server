@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import org.apache.ibatis.transaction.TransactionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import cn.bload.forum.base.Page;
 import cn.bload.forum.dao.ArticleMapper;
 import cn.bload.forum.dao.ArticleTagMapper;
 import cn.bload.forum.dao.ArticleTopicMapper;
@@ -73,7 +73,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public List<ArticleDTO> searchArticles(ArticleQuery articleQuery) {
         Page<ArticleSearchDTO> articleSearchDTOPage = articleSearchService.searchArticles(articleQuery);
-        List<ArticleSearchDTO> articleSearchDTOS = articleSearchDTOPage.get().collect(Collectors.toList());
+        List<ArticleSearchDTO> articleSearchDTOS = articleSearchDTOPage.getRecords().stream().collect(Collectors.toList());
 
         List<Integer> articleIds = new ArrayList<>();
 
@@ -82,7 +82,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         //分页数据填充
-        articleQuery.getPage().setTotal(articleSearchDTOPage.getTotalElements());
+        articleQuery.getPage().setTotal(articleSearchDTOPage.getTotal());
 
         return getArticles(articleIds);
     }

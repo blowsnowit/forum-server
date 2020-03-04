@@ -29,9 +29,6 @@ public class ArticleQuery extends BaseQuery {
     @ApiModelProperty(value = "当前登录的用户id", hidden = true)
     private Integer nowUserId;
 
-    @ApiModelProperty(value = "搜索文章标题")
-    private String search;
-
     @ApiModelProperty(value = "是否是管理员", hidden = true)
     private boolean op;
 }
